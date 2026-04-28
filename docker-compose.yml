@@ -1,0 +1,76 @@
+# husariabeats.com — Docker Compose
+# Educational companion site for Husaria Beats YouTube channel.
+# Bilingual (PL/EN), timeline, album grid, community voting.
+#
+# Usage:
+#   cp .env.example .env && nano .env
+#   docker compose up -d --build
+#   docker compose logs -f
+
+networks:
+  husariabeats_net:
+    driver: bridge
+
+services:
+
+  frontend:
+    build: ./frontend
+    restart: unless-stopped
+    ports:
+      - "127.0.0.1:3001:3000"
+    environment:
+      - NEXT_PUBLIC_API_URL=https://husariabeats.com/api
+    depends_on:
+      - api
+    networks:
+      - husariabeats_net
+
+  api:
+    build: ./api
+    restart: unless-stopped
+    ports:
+      - "127.0.0.1:8001:8000"
+    env_file: .env
+    depends_on:
+      db:
+        condition: service_healthy
+      redis:
+        condition: service_started
+    networks:
+      - husariabeats_net
+
+  db:
+    image: postgres:16-alpine
+    restart: unless-stopped
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+      - ./db/init.sql:/docker-entrypoint-initdb.d/init.sql
+    environment:
+      POSTGRES_DB:       ${POSTGRES_DB:-husariabeats}
+      POSTGRES_USER:     ${POSTGRES_USER:?POSTGRES_USER is required}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:?POSTGRES_PASSWORD is required}
+    healthcheck:
+      test:     ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER}"]
+      interval: 5s
+      timeout:  5s
+      retries:  5
+    networks:
+      - husariabeats_net
+
+  redis:
+    image: redis:7-alpine
+    restart: unless-stopped
+    command: ["redis-server", "--save", "", "--appendonly", "no"]
+    volumes:
+      - redis_data:/data
+    healthcheck:
+      test:     ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout:  5s
+      retries:  5
+    networks:
+      - husariabeats_net
+
+volumes:
+  postgres_data:
+  redis_data:

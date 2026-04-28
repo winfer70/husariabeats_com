@@ -1,0 +1,30 @@
+{
+  "nav": {
+    "timeline": "Oś czasu",
+    "albums":   "Albumy",
+    "next":     "Co dalej?",
+    "about":    "O projekcie"
+  },
+  "home": {
+    "title":    "Husaria Beats",
+    "subtitle": "Muzyczna podróż przez polską historię wojskowości"
+  },
+  "albums": {
+    "title":   "Albumy",
+    "released": "Wydany",
+    "in_production": "W produkcji",
+    "planned": "Planowany"
+  },
+  "voting": {
+    "title":       "Co chcesz usłyszeć jako następne?",
+    "subtitle":    "Zagłosuj na temat, który chcesz zobaczyć w następnym filmie",
+    "vote":        "Głosuj",
+    "votes":       "głosów",
+    "email_label": "Twój adres e-mail",
+    "voted":       "Już głosowałeś!",
+    "suggest":     "Zaproponuj temat"
+  },
+  "about": {
+    "title": "O projekcie"
+  }
+}

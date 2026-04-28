@@ -1,0 +1,29 @@
+[
+  {
+    "id": "wings-of-war",
+    "slug": "wings-of-war",
+    "titlePL": "Skrzydła Wojny",
+    "titleEN": "Wings of War",
+    "coverImage": "/images/wings-of-war-cover.jpg",
+    "status": "released",
+    "releaseDate": null
+  },
+  {
+    "id": "sarmata",
+    "slug": "sarmata",
+    "titlePL": "Sarmata",
+    "titleEN": "Sarmata",
+    "coverImage": null,
+    "status": "in_production",
+    "releaseDate": null
+  },
+  {
+    "id": "odsiecz",
+    "slug": "odsiecz",
+    "titlePL": "Odsiecz",
+    "titleEN": "Relief",
+    "coverImage": null,
+    "status": "planned",
+    "releaseDate": "2025-12-01"
+  }
+]

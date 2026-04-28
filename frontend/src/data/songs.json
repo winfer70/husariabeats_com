@@ -1,0 +1,30 @@
+[
+  {
+    "id": "husaria-vienna-1683",
+    "slug": "husaria-vienna-1683",
+    "titlePL": "Husaria pod Wiedniem 1683",
+    "titleEN": "Husaria at Vienna 1683",
+    "yearEvent": 1683,
+    "era": "Baroque",
+    "youtubeIdPL": "REPLACE_WITH_PL_VIDEO_ID",
+    "youtubeIdEN": "REPLACE_WITH_EN_VIDEO_ID",
+    "imagePath": "/images/husaria-vienna.jpg",
+    "summaryPL": "Największa szarża kawalerii w historii. 12 września 1683 roku husaria złamała oblężenie Wiednia.",
+    "summaryEN": "The largest cavalry charge in history. On September 12, 1683, the husaria broke the siege of Vienna.",
+    "albumSlug": "wings-of-war"
+  },
+  {
+    "id": "bitwa-pod-kircholmem",
+    "slug": "bitwa-pod-kircholmem",
+    "titlePL": "Bitwa pod Kircholmem 1605",
+    "titleEN": "Battle of Kircholm 1605",
+    "yearEvent": 1605,
+    "era": "Renaissance",
+    "youtubeIdPL": "REPLACE_WITH_PL_VIDEO_ID",
+    "youtubeIdEN": "REPLACE_WITH_EN_VIDEO_ID",
+    "imagePath": "/images/kircholm.jpg",
+    "summaryPL": "3500 husarzy rozgromiło 11000 Szwedów w ciągu 20 minut.",
+    "summaryEN": "3500 husaria routed 11,000 Swedes in under 20 minutes.",
+    "albumSlug": "wings-of-war"
+  }
+]

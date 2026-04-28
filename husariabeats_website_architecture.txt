@@ -1,0 +1,265 @@
+================================================================
+  HUSARIABEATS.COM — WEBSITE ARCHITECTURE & DEPLOYMENT PLAN
+================================================================
+
+OVERVIEW
+--------
+Educational companion website for the Husaria Beats YouTube channel.
+Bilingual (PL/EN), timeline-based, community voting, YouTube embeds.
+Domain: husariabeats.com
+Server: same server as ticker-tap.com (existing nginx + Cloudflare DNS)
+
+
+TECH STACK
+----------
+Frontend  : Next.js 14 (App Router, TypeScript, i18n routing)
+API       : FastAPI (Python)
+Database  : PostgreSQL 16
+Cache     : Redis 7 (rate-limiting for votes)
+Containers: Docker Compose
+TLS/Proxy : nginx on HOST (Let's Encrypt cert, same pattern as ticker-tap)
+DNS       : Cloudflare proxied A record → server IP
+
+
+PORTS (host-bound, localhost only)
+-----------------------------------
+Next.js frontend  : 127.0.0.1:3001   (ticker-tap uses :3000 if applicable)
+FastAPI backend   : 127.0.0.1:8001   (ticker-tap uses :8000 — no clash)
+PostgreSQL        : internal Docker network only (no host port)
+Redis             : internal Docker network only (no host port)
+
+
+PROJECT FOLDER ON SERVER
+-------------------------
+~/docker/husariabeats/
+├── docker-compose.yml
+├── .env                        # secrets — never commit
+├── .env.example
+│
+├── frontend/
+│   ├── Dockerfile
+│   ├── next.config.ts          # i18n: locales: ['pl', 'en'], defaultLocale: 'pl'
+│   ├── package.json
+│   └── src/
+│       ├── app/
+│       │   └── [locale]/
+│       │       ├── page.tsx              # timeline (home)
+│       │       ├── albums/
+│       │       │   ├── page.tsx          # albums grid
+│       │       │   └── [slug]/page.tsx   # single album detail
+│       │       ├── next/page.tsx         # community voting
+│       │       └── about/page.tsx        # mission + socials
+│       ├── components/
+│       │   ├── TimelineEntry.tsx         # video + text alternating card
+│       │   ├── AlbumCard.tsx
+│       │   ├── VotingPanel.tsx
+│       │   └── NavBar.tsx                # sticky, language toggle
+│       └── data/                         # JSON content files (swap to CMS later)
+│           ├── songs.json
+│           └── albums.json
+│
+├── api/
+│   ├── Dockerfile
+│   ├── requirements.txt        # fastapi, uvicorn, asyncpg, redis, python-dotenv
+│   ├── main.py
+│   └── routers/
+│       ├── topics.py           # GET /api/topics, POST /api/topics
+│       └── votes.py            # POST /api/votes — Redis 24hr dedup by hashed email
+│
+└── db/
+    └── init.sql                # schema bootstrap (runs on first container start)
+
+
+DOCKER COMPOSE
+--------------
+services:
+
+  frontend:
+    build: ./frontend
+    restart: unless-stopped
+    ports:
+      - "127.0.0.1:3001:3000"
+    environment:
+      - NEXT_PUBLIC_API_URL=https://husariabeats.com/api
+    depends_on:
+      - api
+
+  api:
+    build: ./api
+    restart: unless-stopped
+    ports:
+      - "127.0.0.1:8001:8000"
+    env_file: .env
+    depends_on:
+      db:
+        condition: service_healthy
+      redis:
+        condition: service_started
+
+  db:
+    image: postgres:16-alpine
+    restart: unless-stopped
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+      - ./db/init.sql:/docker-entrypoint-initdb.d/init.sql
+    environment:
+      POSTGRES_DB: husariabeats
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER}"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+  redis:
+    image: redis:7-alpine
+    restart: unless-stopped
+    volumes:
+      - redis_data:/data
+
+volumes:
+  postgres_data:
+  redis_data:
+
+
+DATABASE SCHEMA (db/init.sql)
+------------------------------
+CREATE TABLE topics (
+  id          SERIAL PRIMARY KEY,
+  title       VARCHAR(200) NOT NULL,
+  description TEXT,
+  status      VARCHAR(50) DEFAULT 'open',   -- open | in_development | released
+  created_at  TIMESTAMPTZ DEFAULT NOW()
+);
+
+CREATE TABLE votes (
+  id          SERIAL PRIMARY KEY,
+  topic_id    INTEGER REFERENCES topics(id),
+  email_hash  VARCHAR(64) NOT NULL,          -- SHA-256 of email, never store raw
+  voted_at    TIMESTAMPTZ DEFAULT NOW()
+);
+
+CREATE INDEX idx_votes_topic ON votes(topic_id);
+CREATE INDEX idx_votes_email_hash ON votes(email_hash);
+
+
+NGINX CONFIG — /etc/nginx/sites-available/husariabeats.com.conf
+----------------------------------------------------------------
+# HTTP → HTTPS redirect
+server {
+    listen 80;
+    listen [::]:80;
+    server_name husariabeats.com www.husariabeats.com;
+
+    location /.well-known/acme-challenge/ { root /var/www/certbot; }
+    location / { return 301 https://$host$request_uri; }
+}
+
+# HTTPS
+server {
+    listen 443 ssl http2;
+    listen [::]:443 ssl http2;
+    server_name husariabeats.com www.husariabeats.com;
+
+    ssl_certificate     /etc/letsencrypt/live/husariabeats.com/fullchain.pem;
+    ssl_certificate_key /etc/letsencrypt/live/husariabeats.com/privkey.pem;
+    ssl_protocols       TLSv1.2 TLSv1.3;
+    ssl_prefer_server_ciphers off;
+    ssl_session_cache   shared:SSL:10m;
+    ssl_session_timeout 1d;
+    ssl_stapling        on;
+    ssl_stapling_verify on;
+
+    add_header Strict-Transport-Security "max-age=31536000; includeSubDomains; preload" always;
+    add_header X-Content-Type-Options "nosniff" always;
+    add_header Referrer-Policy "strict-origin-when-cross-origin" always;
+    # NOTE: X-Frame-Options DENY is intentionally omitted — YouTube embeds need it
+
+    client_max_body_size 5m;
+
+    # API — FastAPI container
+    location /api/ {
+        proxy_pass         http://127.0.0.1:8001;
+        proxy_http_version 1.1;
+        proxy_set_header   Host              $host;
+        proxy_set_header   X-Real-IP         $remote_addr;
+        proxy_set_header   X-Forwarded-For   $proxy_add_x_forwarded_for;
+        proxy_set_header   X-Forwarded-Proto $scheme;
+    }
+
+    # Frontend — Next.js container
+    location / {
+        proxy_pass         http://127.0.0.1:3001;
+        proxy_http_version 1.1;
+        proxy_set_header   Upgrade    $http_upgrade;
+        proxy_set_header   Connection "upgrade";
+        proxy_set_header   Host       $host;
+        proxy_set_header   X-Real-IP  $remote_addr;
+        proxy_set_header   X-Forwarded-For   $proxy_add_x_forwarded_for;
+        proxy_set_header   X-Forwarded-Proto $scheme;
+    }
+}
+
+
+DEPLOYMENT STEPS (run once on server)
+--------------------------------------
+# 1. Clone / create project folder
+mkdir -p ~/docker/husariabeats
+cd ~/docker/husariabeats
+
+# 2. Add Cloudflare DNS A record: husariabeats.com → server IP (orange cloud)
+#    Set SSL/TLS mode to Full (strict)
+
+# 3. Get TLS cert (nginx must be running, port 80 open)
+sudo certbot --nginx -d husariabeats.com -d www.husariabeats.com
+
+# 4. Enable nginx config
+sudo ln -s /etc/nginx/sites-available/husariabeats.com.conf /etc/nginx/sites-enabled/
+sudo nginx -t && sudo nginx -s reload
+
+# 5. Create .env from example
+cp .env.example .env
+# Fill in: POSTGRES_USER, POSTGRES_PASSWORD, REDIS_URL, SECRET_KEY
+
+# 6. Start all containers
+docker compose up -d
+
+# 7. Verify
+docker compose ps
+curl -I https://husariabeats.com
+
+
+.env.example
+------------
+POSTGRES_USER=husaria
+POSTGRES_PASSWORD=changeme_strong_password
+POSTGRES_DB=husariabeats
+REDIS_URL=redis://redis:6379/0
+SECRET_KEY=changeme_random_64char_string
+NEXT_PUBLIC_API_URL=https://husariabeats.com/api
+
+
+SWAPPABILITY NOTES
+------------------
+Content (songs/albums) : JSON files in frontend/src/data/ → swap to Strapi/Directus
+                         later without touching API or nginx
+API framework          : FastAPI on :8001 → swap to Node/Express, nginx doesn't care
+Auth (voting)          : email magic link → swap to Google OAuth in one router file
+Database               : PostgreSQL with Alembic migrations ready to add
+Frontend framework     : Next.js container on :3001 → fully swappable
+
+
+KEY DESIGN DECISIONS
+--------------------
+- Language in URL: /pl/... and /en/... (SEO + shareable links)
+- Language drives which YouTube embed src is shown per song (PL vs EN video ID)
+- Song content stored in songs.json: { id, slug, titlePL, titleEN,
+  yearEvent, era, youtubeIdPL, youtubeIdEN, imagePath, summaryPL, summaryEN,
+  sourcesPL[], sourcesEN[], albumSlug }
+- Voting: email hash stored (SHA-256), never raw email; Redis key = hash:topicId
+  with 24hr TTL; upvote only (no downvote)
+- Albums: status field — "released" | "in_production" | "planned"
+  Planned albums show countdown to releaseDate instead of cover art
+
+================================================================

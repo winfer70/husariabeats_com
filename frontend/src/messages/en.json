@@ -1,0 +1,30 @@
+{
+  "nav": {
+    "timeline": "Timeline",
+    "albums":   "Albums",
+    "next":     "What's next?",
+    "about":    "About"
+  },
+  "home": {
+    "title":    "Husaria Beats",
+    "subtitle": "A musical journey through Polish military history"
+  },
+  "albums": {
+    "title":   "Albums",
+    "released": "Released",
+    "in_production": "In production",
+    "planned": "Planned"
+  },
+  "voting": {
+    "title":       "What do you want to hear next?",
+    "subtitle":    "Vote for the topic you want to see in the next video",
+    "vote":        "Vote",
+    "votes":       "votes",
+    "email_label": "Your email address",
+    "voted":       "You already voted!",
+    "suggest":     "Suggest a topic"
+  },
+  "about": {
+    "title": "About the project"
+  }
+}

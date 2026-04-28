@@ -1,0 +1,83 @@
+[
+  {
+    "id": "grunwald-1410",
+    "era": "medieval",
+    "year": "1410",
+    "yearLabel": "15 VII 1410",
+    "albumSlug": "rzeczpospolita",
+    "bg": { "hue": 28, "label": "Battle of Grunwald — banners against thundercloud sky" },
+    "title":    { "PL": "Grunwald",                   "EN": "Grunwald" },
+    "subtitle": { "PL": "Złamane miecze Zakonu",       "EN": "The Order's Broken Swords" },
+    "summary": {
+      "PL": "Połączone wojska Korony i Litwy rozbiły Zakon Krzyżacki w jednej z największych bitew średniowiecznej Europy. Wielki mistrz Ulrich von Jungingen poległ na polu. Pieśń pisze się w trzech głosach: rycerza, husarza-prekursora i kronikarza Długosza.",
+      "EN": "The combined armies of the Crown and Lithuania crushed the Teutonic Order in one of medieval Europe's largest battles. Grand Master Ulrich von Jungingen fell on the field. The track is written in three voices — a knight, a precursor-hussar, and the chronicler Długosz."
+    },
+    "longText": {
+      "PL": "Bitwa rozegrała się między wsiami Grunwald, Stębark i Łodwigowo. Jagiełło, modląc się o świcie, opóźnił atak — zmuszając ciężkozbrojnych krzyżaków do walki w pełnym słońcu. Litwini Witolda wykonali pozorowany odwrót, a polska chorągiew święta wytrzymała szarżę. Po dziewięciu godzinach Zakon przestał istnieć jako siła militarna na pokolenie.",
+      "EN": "The battle was fought between the villages of Grunwald, Stębark and Łodwigowo. Jagiełło, praying at dawn, delayed the attack — forcing the heavily-armoured Teutonic knights to fight in full sun. Vytautas's Lithuanians staged a feigned retreat; the Polish royal banner held the charge. Nine hours later, the Order was finished as a military power for a generation."
+    },
+    "sources": [
+      "Długosz, Annales (1455–1480)",
+      "Stefan M. Kuczyński, Wielka Wojna z Zakonem 1409–1411",
+      "S.C. Rowell, Lithuania Ascending"
+    ],
+    "plVideoId": null,
+    "enVideoId": null,
+    "plays": null,
+    "duration": null
+  },
+  {
+    "id": "warsaw-uprising-1944",
+    "era": "wwii",
+    "year": "1944",
+    "yearLabel": "1 VIII 1944",
+    "albumSlug": "godzina-w",
+    "bg": { "hue": 12, "label": "Warsaw 1944 — sewer entrance, ash and concrete" },
+    "title":    { "PL": "Godzina W",  "EN": "W-Hour" },
+    "subtitle": { "PL": "63 dni",     "EN": "63 Days" },
+    "summary": {
+      "PL": "1 sierpnia, godzina 17:00. Armia Krajowa rozpoczyna powstanie. 63 dni walki, 200 tysięcy zabitych cywilów, miasto zrównane z ziemią. Utwór prowadzony jest z perspektywy łączniczki — dwunastoletniej dziewczynki niosącej meldunki kanałami.",
+      "EN": "August 1st, 5pm. The Home Army rises. 63 days of fighting, 200,000 civilians killed, the city razed. The track is told through the eyes of a runner — a twelve-year-old girl carrying messages through the sewers."
+    },
+    "longText": {
+      "PL": "Powstanie miało trwać kilka dni — do nadejścia Armii Czerwonej. Stalin zatrzymał ofensywę na linii Wisły. Warszawa walczyła sama. Kanały stały się arteriami miasta: błoto, zaduch, ciemność. Po kapitulacji Niemcy wysadzili to, co zostało — ulica po ulicy, dom po domu.",
+      "EN": "The uprising was meant to last days — until the Red Army arrived. Stalin halted at the Vistula. Warsaw fought alone. The sewers became the city's arteries — mud, stench, darkness. After surrender, the Germans dynamited what remained — street by street, house by house."
+    },
+    "sources": [
+      "Norman Davies, Rising '44",
+      "Muzeum Powstania Warszawskiego — Archiwum",
+      "Białoszewski, Pamiętnik z powstania"
+    ],
+    "plVideoId": null,
+    "enVideoId": null,
+    "plays": null,
+    "duration": null
+  },
+  {
+    "id": "gdansk-1980",
+    "era": "coldwar",
+    "year": "1980",
+    "yearLabel": "31 VIII 1980",
+    "albumSlug": "stocznia",
+    "bg": { "hue": 200, "label": "Gdańsk shipyard gates — Solidarność banner, rain" },
+    "title":    { "PL": "Stocznia",       "EN": "The Shipyard" },
+    "subtitle": { "PL": "21 postulatów", "EN": "21 Demands" },
+    "summary": {
+      "PL": "Sierpień 1980. Wałęsa przeskakuje przez mur Stoczni Gdańskiej. Strajk rozszerza się na całe Wybrzeże. 21 postulatów — pierwsza wolna związkowa siła w bloku sowieckim. Refren kolektywny: chór stoczniowców na podkładzie 808.",
+      "EN": "August 1980. Wałęsa jumps the Gdańsk Shipyard wall. The strike spreads across the coast. 21 Demands — the first free trade union behind the Iron Curtain. The hook is collective: a shipyard chorus over an 808."
+    },
+    "longText": {
+      "PL": "Iskra: zwolnienie suwnicowej Anny Walentynowicz, pięć miesięcy przed emeryturą. W ciągu kilku dni 700 zakładów stanęło. Porozumienia Sierpniowe podpisano długopisem-pamiątką z wizerunkiem Jana Pawła II. Solidarność liczyła 10 milionów członków. Stan wojenny wprowadzono 16 miesięcy później.",
+      "EN": "The spark: the firing of crane operator Anna Walentynowicz, five months before her pension. Within days, 700 workplaces struck. The August Accords were signed with a souvenir pen bearing John Paul II's likeness. Solidarność grew to 10 million members. Martial law followed sixteen months later."
+    },
+    "sources": [
+      "Timothy Garton Ash, The Polish Revolution",
+      "ECS Gdańsk — Archiwum Solidarności",
+      "Andrzej Friszke, Rewolucja Solidarności"
+    ],
+    "plVideoId": null,
+    "enVideoId": null,
+    "plays": null,
+    "duration": null
+  }
+]

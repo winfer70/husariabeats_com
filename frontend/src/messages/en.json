@@ -1,30 +1,83 @@
 {
+  "tagline": "Historia • Muzyka • Prawda",
   "nav": {
     "timeline": "Timeline",
     "albums":   "Albums",
-    "next":     "What's next?",
+    "whatsNext":"What's Next",
     "about":    "About"
   },
-  "home": {
-    "title":    "Husaria Beats",
-    "subtitle": "A musical journey through Polish military history"
+  "eras": {
+    "all":      "All",
+    "medieval": "Medieval",
+    "partitions":"Partitions",
+    "wwi":      "WWI",
+    "wwii":     "WWII",
+    "coldwar":  "Cold War",
+    "modern":   "Modern"
+  },
+  "timeline": {
+    "title":    "Timeline",
+    "subtitle": "Polish history through songs — scroll to walk through the centuries.",
+    "filterEra":"Filter era",
+    "readMore": "Read the full story",
+    "collapse": "Collapse",
+    "sources":  "Citations",
+    "scrollCue":"↓ scroll through the centuries",
+    "noTracks": "No tracks in this era — yet.",
+    "badge":    "HUSARIABEATS · VOL. I — VII"
   },
   "albums": {
-    "title":   "Albums",
-    "released": "Released",
-    "in_production": "In production",
-    "planned": "Planned"
+    "title":        "Albums",
+    "subtitle":     "Collections of songs by era. Released and upcoming.",
+    "badge":        "HUSARIABEATS · DISCOGRAFIA",
+    "songCount":    "{n} tracks",
+    "inProduction": "In Production",
+    "releasesIn":   "Releasing in {d} days",
+    "available":    "AVAILABLE",
+    "open":         "Open",
+    "tracklist":    "Tracklist"
   },
-  "voting": {
-    "title":       "What do you want to hear next?",
-    "subtitle":    "Vote for the topic you want to see in the next video",
-    "vote":        "Vote",
-    "votes":       "votes",
-    "email_label": "Your email address",
-    "voted":       "You already voted!",
-    "suggest":     "Suggest a topic"
+  "whatsNext": {
+    "title":        "What Happens Next?",
+    "subtitle":     "Propose a historical event. The community picks the next song.",
+    "badge":        "COMMUNITY · ROADMAP",
+    "submitTopic":  "Submit a topic",
+    "formTitle":    "What should we record next?",
+    "formSubtitle": "No account. Magic link via email — then you can vote.",
+    "topicTitle":   "Topic title",
+    "topicDesc":    "Short description (2–3 sentences)",
+    "topicEmail":   "Your email (magic link verification)",
+    "topicPlaceholderTitle": "e.g. Siege of Vienna 1683",
+    "topicPlaceholderDesc":  "Why this event deserves a track…",
+    "submit":       "Send proposal",
+    "checkInbox":   "Check your inbox",
+    "rankingTitle": "Community ranking",
+    "topics":       "topics",
+    "votes":        "votes",
+    "topChoice":    "★ TOP CHOICE",
+    "devBadge":     "Under Development",
+    "releaseLabel": "Release",
+    "voteNote":     "1 vote / topic / 24h. Email is only for verification — no newsletter."
   },
   "about": {
-    "title": "About the project"
+    "title":        "About the channel",
+    "badge":        "ABOUT HUSARIABEATS",
+    "mission":      "Polish history, told in beats. AI-generated melodic trap and rap that turns the chronicles into tracks.",
+    "nextDrop":     "Next drop in {d} days · {album}",
+    "enterTimeline":"Enter the timeline",
+    "seeAlbums":    "See albums",
+    "statsLabel":   ["Tracks released", "Subscribers", "Albums", "Years covered"],
+    "followBadge":  "FOLLOW",
+    "followTitle":  "Wherever you listen",
+    "newsletter":   "Notify me when the next song drops",
+    "newsletterSub":"One email per song. No spam. No tracking.",
+    "subscribe":    "Subscribe",
+    "subscribed":   "Subscribed",
+    "contact":      "Contact"
+  },
+  "footer": {
+    "rights":    "All rights reserved",
+    "privacy":   "Privacy",
+    "terms":     "Terms"
   }
 }

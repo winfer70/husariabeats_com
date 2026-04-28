@@ -1,30 +1,83 @@
 {
+  "tagline": "Historia • Muzyka • Prawda",
   "nav": {
     "timeline": "Oś czasu",
     "albums":   "Albumy",
-    "next":     "Co dalej?",
-    "about":    "O projekcie"
+    "whatsNext":"Co dalej?",
+    "about":    "O nas"
   },
-  "home": {
-    "title":    "Husaria Beats",
-    "subtitle": "Muzyczna podróż przez polską historię wojskowości"
+  "eras": {
+    "all":      "Wszystkie",
+    "medieval": "Średniowiecze",
+    "partitions":"Rozbiory",
+    "wwi":      "I Wojna",
+    "wwii":     "II Wojna",
+    "coldwar":  "Zimna Wojna",
+    "modern":   "Współczesność"
+  },
+  "timeline": {
+    "title":    "Oś czasu",
+    "subtitle": "Historia Polski w utworach — przewijaj, by przejść przez wieki.",
+    "filterEra":"Filtruj epokę",
+    "readMore": "Czytaj całą historię",
+    "collapse": "Zwiń",
+    "sources":  "Źródła",
+    "scrollCue":"↓ przewijaj przez wieki",
+    "noTracks": "Brak utworów w tej epoce — jeszcze.",
+    "badge":    "HUSARIABEATS · VOL. I — VII"
   },
   "albums": {
-    "title":   "Albumy",
-    "released": "Wydany",
-    "in_production": "W produkcji",
-    "planned": "Planowany"
+    "title":        "Albumy",
+    "subtitle":     "Zbiory utworów według epok. Premiery i nadchodzące projekty.",
+    "badge":        "HUSARIABEATS · DISCOGRAFIA",
+    "songCount":    "{n} utworów",
+    "inProduction": "W produkcji",
+    "releasesIn":   "Premiera za {d} dni",
+    "available":    "DOSTĘPNY",
+    "open":         "Otwórz",
+    "tracklist":    "Tracklista"
   },
-  "voting": {
-    "title":       "Co chcesz usłyszeć jako następne?",
-    "subtitle":    "Zagłosuj na temat, który chcesz zobaczyć w następnym filmie",
-    "vote":        "Głosuj",
-    "votes":       "głosów",
-    "email_label": "Twój adres e-mail",
-    "voted":       "Już głosowałeś!",
-    "suggest":     "Zaproponuj temat"
+  "whatsNext": {
+    "title":        "Co dalej?",
+    "subtitle":     "Zaproponuj wydarzenie historyczne. Społeczność wybiera następny utwór.",
+    "badge":        "COMMUNITY · ROADMAP",
+    "submitTopic":  "Zaproponuj temat",
+    "formTitle":    "Co powinniśmy nagrać dalej?",
+    "formSubtitle": "Bez konta. Magic link na email — i głosujesz.",
+    "topicTitle":   "Tytuł tematu",
+    "topicDesc":    "Krótki opis (2–3 zdania)",
+    "topicEmail":   "Twój e-mail (weryfikacja przez magic link)",
+    "topicPlaceholderTitle": "np. Bitwa pod Wiedniem 1683",
+    "topicPlaceholderDesc":  "Dlaczego to wydarzenie zasługuje na utwór…",
+    "submit":       "Wyślij propozycję",
+    "checkInbox":   "Sprawdź skrzynkę pocztową",
+    "rankingTitle": "Ranking społeczności",
+    "topics":       "tematów",
+    "votes":        "głosów",
+    "topChoice":    "★ TOP CHOICE",
+    "devBadge":     "W produkcji",
+    "releaseLabel": "Premiera",
+    "voteNote":     "1 głos / temat / 24h. Email służy tylko do weryfikacji — żadnego newslettera."
   },
   "about": {
-    "title": "O projekcie"
+    "title":        "O kanale",
+    "badge":        "O HUSARIABEATS",
+    "mission":      "Polska historia opowiedziana przez bity. AI-generowany trap melodyczny i rap, który zamienia kroniki w utwory.",
+    "nextDrop":     "Następna premiera za {d} dni · {album}",
+    "enterTimeline":"Wejdź na oś czasu",
+    "seeAlbums":    "Zobacz albumy",
+    "statsLabel":   ["Wydanych utworów", "Subskrybentów", "Albumów", "Lat historii"],
+    "followBadge":  "OBSERWUJ",
+    "followTitle":  "Wszędzie, gdzie słuchasz",
+    "newsletter":   "Powiadom mnie, gdy pojawi się nowy utwór",
+    "newsletterSub":"Jeden e-mail na utwór. Bez spamu. Bez analityki.",
+    "subscribe":    "Zapisz się",
+    "subscribed":   "Zapisano",
+    "contact":      "Kontakt"
+  },
+  "footer": {
+    "rights":    "Wszelkie prawa zastrzeżone",
+    "privacy":   "Polityka prywatności",
+    "terms":     "Regulamin"
   }
 }

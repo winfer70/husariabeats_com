@@ -1,0 +1,66 @@
+[
+  {
+    "id": 1,
+    "title":  { "PL": "Bitwa pod Wiedniem 1683",      "EN": "Siege of Vienna, 1683" },
+    "desc":   { "PL": "Sobieski, husaria, ostatnia wielka odsiecz chrześcijaństwa.", "EN": "Sobieski, the hussars, the last great relief of Christendom." },
+    "votes":  1247,
+    "status": "dev",
+    "release": "Jun 2026"
+  },
+  {
+    "id": 2,
+    "title":  { "PL": "Katyń 1940",                   "EN": "Katyń, 1940" },
+    "desc":   { "PL": "Mord na 22 tysiącach polskich oficerów. Cisza, las, kłamstwo trwające pół wieku.", "EN": "The murder of 22,000 Polish officers. Silence, forest, a lie that lasted half a century." },
+    "votes":  982,
+    "status": "planned",
+    "release": "Sep 2026"
+  },
+  {
+    "id": 3,
+    "title":  { "PL": "Konstytucja 3 Maja",            "EN": "Constitution of May 3" },
+    "desc":   { "PL": "Druga konstytucja na świecie. Pierwsza w Europie. Reakcja Rosji była natychmiastowa.", "EN": "The world's second written constitution. Europe's first. Russia's reaction was immediate." },
+    "votes":  743,
+    "status": "open",
+    "release": null
+  },
+  {
+    "id": 4,
+    "title":  { "PL": "Powstanie Styczniowe",          "EN": "January Uprising" },
+    "desc":   { "PL": "1863. Partyzantka w lasach przeciwko imperium. Symboliczna porażka, która stała się fundamentem.", "EN": "1863. Forest partisans against an empire. A symbolic defeat that became foundational." },
+    "votes":  612,
+    "status": "open",
+    "release": null
+  },
+  {
+    "id": 5,
+    "title":  { "PL": "Cud nad Wisłą 1920",            "EN": "Miracle on the Vistula, 1920" },
+    "desc":   { "PL": "Piłsudski, Tuchaczewski, osiemnasta przełomowa bitwa świata.", "EN": "Piłsudski, Tukhachevsky, the eighteenth decisive battle of world history." },
+    "votes":  588,
+    "status": "open",
+    "release": null
+  },
+  {
+    "id": 6,
+    "title":  { "PL": "Westerplatte",                  "EN": "Westerplatte" },
+    "desc":   { "PL": "1 września, 4:45. 'Jeszcze Polska nie zginęła'.", "EN": "September 1st, 4:45 AM. 'Poland is not yet lost.'" },
+    "votes":  421,
+    "status": "open",
+    "release": null
+  },
+  {
+    "id": 7,
+    "title":  { "PL": "Jan Paweł II — Wiktoria 1979",  "EN": "John Paul II — Victory '79" },
+    "desc":   { "PL": "'Niech zstąpi Duch Twój'. Pielgrzymka, która zaczęła upadek systemu.", "EN": "The pilgrimage that started the system's collapse." },
+    "votes":  389,
+    "status": "open",
+    "release": null
+  },
+  {
+    "id": 8,
+    "title":  { "PL": "Mała Stabilizacja Gomułki",     "EN": "Gomułka's Small Stabilization" },
+    "desc":   { "PL": "1956–1968. Lato gierkowskie, marzec '68, droga do strajków.", "EN": "1956–1968. The pre-Gierek thaw, March '68, the road to the strikes." },
+    "votes":  156,
+    "status": "open",
+    "release": null
+  }
+]

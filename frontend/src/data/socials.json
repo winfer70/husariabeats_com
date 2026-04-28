@@ -1,0 +1,7 @@
+[
+  { "name": "YouTube",   "handle": "@husariabeats",  "subs": "412K", "hue": 0,   "url": "https://youtube.com/@husariabeats" },
+  { "name": "Spotify",   "handle": "Husaria Beats",  "subs": "89K",  "hue": 140, "url": "https://open.spotify.com" },
+  { "name": "Instagram", "handle": "@husariabeats",  "subs": "204K", "hue": 320, "url": "https://instagram.com/husariabeats" },
+  { "name": "TikTok",    "handle": "@husariabeats",  "subs": "1.1M", "hue": 180, "url": "https://tiktok.com/@husariabeats" },
+  { "name": "Facebook",  "handle": "Husaria Beats",  "subs": "67K",  "hue": 215, "url": "https://facebook.com/husariabeats" }
+]

@@ -1,15 +1,16 @@
 # routers/songs.py — Song management endpoints
 #
 # Routes:
-#   GET   /api/songs          — list all songs, optional ?album_slug= filter
-#   POST  /api/songs          — create a new song
-#   PATCH /api/songs/{slug}   — update any song field (status, YouTube IDs, metadata,
-#                               streaming URLs: spotify, apple_music, amazon, youtube_music, itunes,
-#                               content: subtitle, summary, long_text, sources, year_label, bg_hue, bg_label)
+#   GET    /api/songs          — list all songs, optional ?album_slug= filter
+#   POST   /api/songs          — create a new song
+#   PATCH  /api/songs/{slug}   — update any song field (status, YouTube IDs, metadata,
+#                                streaming URLs: spotify, apple_music, amazon, youtube_music, itunes,
+#                                content: subtitle, summary, long_text, sources, year_label, bg_hue, bg_label)
+#   DELETE /api/songs/{slug}   — delete a song; blocked while an active release is in progress
 #
 # Inputs:  SongCreate (slug+title_pl+title_en required, rest optional)
 #          SongUpdate (all fields optional)
-# Outputs: list[SongOut] | SongOut
+# Outputs: list[SongOut] | SongOut | 204 No Content
 
 from __future__ import annotations
 
@@ -288,3 +289,54 @@ async def update_song(slug: str, body: SongUpdate):
     if not row:
         raise HTTPException(status_code=500, detail="Update failed")
     return dict(row)
+
+
+@router.delete("/songs/{slug}", status_code=204)
+async def delete_song(slug: str):
+    """
+    Delete a song record by slug.
+
+    Blocked while a release_queue entry for the song is in an active state
+    (any status other than 'released' or 'failed'), to avoid deleting a song
+    mid-release pipeline.  The ON DELETE CASCADE on release_queue.song_slug
+    ensures any completed/failed queue rows are removed automatically.
+
+    Args:
+        slug: URL path parameter identifying the song to delete.
+
+    Returns:
+        204 No Content on success.
+
+    Raises:
+        HTTPException 404 if no song with the given slug exists.
+        HTTPException 409 if the song has an active release_queue entry.
+    """
+    # Verify song exists
+    existing = await db.fetch_one(
+        "SELECT slug FROM songs WHERE slug = :slug",
+        {"slug": slug},
+    )
+    if not existing:
+        raise HTTPException(status_code=404, detail=f"Song '{slug}' not found")
+
+    # Block deletion while an active release is in progress
+    active_release = await db.fetch_one(
+        """
+        SELECT id FROM release_queue
+        WHERE  song_slug = :slug
+          AND  status NOT IN ('released', 'failed')
+        LIMIT  1
+        """,
+        {"slug": slug},
+    )
+    if active_release:
+        raise HTTPException(
+            status_code=409,
+            detail=f"Song '{slug}' has an active release in progress; cancel it first",
+        )
+
+    # Delete the song; FK ON DELETE CASCADE cleans up release_queue rows
+    await db.execute(
+        "DELETE FROM songs WHERE slug = :slug",
+        {"slug": slug},
+    )

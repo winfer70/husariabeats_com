@@ -29,12 +29,36 @@ const STATUS_BADGE: Record<string, string> = {
   released:       "badge-green",
 };
 
+/** Clickable sortable table header cell. Highlights active column with gold arrow. */
+function SortableTH({ field, label, width, sortField, sortDir, onSort }: {
+  field: string; label: string; width?: number;
+  sortField: string; sortDir: "asc" | "desc";
+  onSort: (field: string) => void;
+}) {
+  const active = sortField === field;
+  return (
+    <th
+      onClick={() => onSort(field)}
+      style={{
+        fontSize: 11, padding: "6px 8px", whiteSpace: "nowrap",
+        minWidth: width, maxWidth: width,
+        cursor: "pointer", userSelect: "none",
+        color: active ? "#c8a84b" : undefined,
+      }}
+    >
+      {label} {active ? (sortDir === "asc" ? "↑" : "↓") : <span style={{ opacity: 0.3 }}>↕</span>}
+    </th>
+  );
+}
+
 export default function VotingPage() {
   const [topics, setTopics]   = useState<Topic[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError]     = useState<string | null>(null);
   const [saving, setSaving]   = useState<Record<number, boolean>>({});
   const [toast, setToast]     = useState<{ msg: string; type: "ok" | "err" } | null>(null);
+  const [sortField, setSortField] = useState<string>("vote_count");
+  const [sortDir,   setSortDir]   = useState<"asc" | "desc">("desc");
 
   function showToast(msg: string, type: "ok" | "err" = "err") {
     setToast({ msg, type });
@@ -92,6 +116,25 @@ export default function VotingPage() {
     }
   }
 
+  /** Toggle sort direction on same field; reset to asc on new field. */
+  function handleSort(field: string) {
+    if (field === sortField) setSortDir(d => d === "asc" ? "desc" : "asc");
+    else { setSortField(field); setSortDir("asc"); }
+  }
+
+  /**
+   * Sorted copy of topics array for rendering.
+   * id and vote_count use numeric comparison; others use locale string compare.
+   */
+  const sorted = [...topics].sort((a, b) => {
+    const dir = sortDir === "asc" ? 1 : -1;
+    if (sortField === "id" || sortField === "vote_count") {
+      return ((a[sortField as "id" | "vote_count"] ?? 0) - (b[sortField as "id" | "vote_count"] ?? 0)) * dir;
+    }
+    const f = sortField as keyof Topic;
+    return ((a[f] ?? "") as string).localeCompare((b[f] ?? "") as string) * dir;
+  });
+
   return (
     <>
       <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 24 }}>
@@ -118,11 +161,11 @@ export default function VotingPage() {
           <table className="data-table">
             <thead>
               <tr>
-                <th>ID</th>
-                <th>Title</th>
-                <th>Status</th>
-                <th>Votes</th>
-                <th>Planned Release</th>
+                <SortableTH field="id"               label="#"       sortField={sortField} sortDir={sortDir} onSort={handleSort} />
+                <SortableTH field="title"            label="Title"   sortField={sortField} sortDir={sortDir} onSort={handleSort} />
+                <SortableTH field="status"           label="Status"  sortField={sortField} sortDir={sortDir} onSort={handleSort} />
+                <SortableTH field="vote_count"       label="Votes"   sortField={sortField} sortDir={sortDir} onSort={handleSort} />
+                <SortableTH field="planned_release"  label="Planned" sortField={sortField} sortDir={sortDir} onSort={handleSort} />
               </tr>
             </thead>
             <tbody>
@@ -133,7 +176,7 @@ export default function VotingPage() {
                   </td>
                 </tr>
               ) : (
-                topics.map(topic => (
+                sorted.map(topic => (
                   <tr key={topic.id} style={{ opacity: saving[topic.id] ? 0.6 : 1, transition: "opacity 0.15s" }}>
                     <td style={{ color: "#a89a92", fontFamily: "monospace", fontSize: 12 }}>
                       {topic.id}

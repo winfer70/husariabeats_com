@@ -158,6 +158,28 @@ function TH({ children, width }: { children: React.ReactNode; width?: number }) 
   );
 }
 
+/** Clickable sortable table header cell. Highlights active column with gold arrow. */
+function SortableTH({ field, label, width, sortField, sortDir, onSort }: {
+  field: string; label: string; width?: number;
+  sortField: string; sortDir: "asc" | "desc";
+  onSort: (field: string) => void;
+}) {
+  const active = sortField === field;
+  return (
+    <th
+      onClick={() => onSort(field)}
+      style={{
+        fontSize: 11, padding: "6px 8px", whiteSpace: "nowrap",
+        minWidth: width, maxWidth: width,
+        cursor: "pointer", userSelect: "none",
+        color: active ? "#c8a84b" : undefined,
+      }}
+    >
+      {label} {active ? (sortDir === "asc" ? "↑" : "↓") : <span style={{ opacity: 0.3 }}>↕</span>}
+    </th>
+  );
+}
+
 /** Table data cell wrapper. */
 function TD({ children, center }: { children: React.ReactNode; center?: boolean }) {
   return (
@@ -175,6 +197,8 @@ export default function SongsPage() {
   const [saving, setSaving]         = useState<Record<string, boolean>>({});
   const [expandedSlug, setExpanded] = useState<string | null>(null);
   const [toast, setToast]           = useState<string | null>(null);
+  const [sortField, setSortField]   = useState<string>("year_event");
+  const [sortDir,   setSortDir]     = useState<"asc" | "desc">("asc");
 
   function showToast(msg: string) {
     setToast(msg);
@@ -228,6 +252,25 @@ export default function SongsPage() {
   // Columns: expand + slug + 7 meta + 2 YT + 5 platform = 16 total
   const COL_COUNT = 16;
 
+  /** Toggle sort direction on same field; reset to asc on new field. */
+  function handleSort(field: string) {
+    if (field === sortField) setSortDir(d => d === "asc" ? "desc" : "asc");
+    else { setSortField(field); setSortDir("asc"); }
+  }
+
+  /**
+   * Sorted copy of songs array for rendering.
+   * year_event uses numeric comparison; all other fields use locale string compare.
+   */
+  const sorted = [...songs].sort((a, b) => {
+    const dir = sortDir === "asc" ? 1 : -1;
+    if (sortField === "year_event") {
+      return ((a.year_event ?? 0) - (b.year_event ?? 0)) * dir;
+    }
+    const f = sortField as keyof Song;
+    return ((a[f] ?? "") as string).localeCompare((b[f] ?? "") as string) * dir;
+  });
+
   return (
     <>
       <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 24 }}>
@@ -257,14 +300,14 @@ export default function SongsPage() {
             <thead>
               <tr>
                 <TH width={32}>{""}</TH>
-                <TH width={140}>Slug</TH>
-                <TH width={150}>Title PL</TH>
-                <TH width={150}>Title EN</TH>
-                <TH width={110}>Status</TH>
-                <TH width={110}>Album</TH>
-                <TH width={95}>Era</TH>
-                <TH width={70}>Year</TH>
-                <TH width={105}>Release</TH>
+                <SortableTH field="slug"         label="Slug"    width={140} sortField={sortField} sortDir={sortDir} onSort={handleSort} />
+                <SortableTH field="title_pl"     label="Title PL" width={150} sortField={sortField} sortDir={sortDir} onSort={handleSort} />
+                <SortableTH field="title_en"     label="Title EN" width={150} sortField={sortField} sortDir={sortDir} onSort={handleSort} />
+                <SortableTH field="status"       label="Status"  width={110} sortField={sortField} sortDir={sortDir} onSort={handleSort} />
+                <SortableTH field="album_slug"   label="Album"   width={110} sortField={sortField} sortDir={sortDir} onSort={handleSort} />
+                <SortableTH field="era"          label="Era"     width={95}  sortField={sortField} sortDir={sortDir} onSort={handleSort} />
+                <SortableTH field="year_event"   label="Year"    width={70}  sortField={sortField} sortDir={sortDir} onSort={handleSort} />
+                <SortableTH field="release_date" label="Release" width={105} sortField={sortField} sortDir={sortDir} onSort={handleSort} />
                 <TH width={110}>YT PL</TH>
                 <TH width={110}>YT EN</TH>
                 <TH width={210}>Spotify</TH>
@@ -284,7 +327,7 @@ export default function SongsPage() {
                   </td>
                 </tr>
               ) : (
-                songs.map(song => {
+                sorted.map(song => {
                   const isExpanded = expandedSlug === song.slug;
                   const isSaving   = saving[song.slug];
                   const patch      = (u: Partial<Song>) => patchSong(song.slug, u, song);

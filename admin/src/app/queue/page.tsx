@@ -37,6 +37,35 @@ const STATUS_BADGE: Record<string, string> = {
   failed:    "badge-red",
 };
 
+/**
+ * SortableTH — clickable header cell that toggles sort direction.
+ *
+ * @param field     - Sort key identifier.
+ * @param label     - Display label.
+ * @param sortField - Currently active sort field.
+ * @param sortDir   - Current sort direction.
+ * @param onSort    - Callback to request sort by this field.
+ */
+function SortableTH({ field, label, sortField, sortDir, onSort }: {
+  field: string; label: string;
+  sortField: string; sortDir: "asc" | "desc";
+  onSort: (field: string) => void;
+}) {
+  const active = sortField === field;
+  return (
+    <th
+      onClick={() => onSort(field)}
+      style={{
+        fontSize: 11, padding: "6px 8px", whiteSpace: "nowrap",
+        cursor: "pointer", userSelect: "none",
+        color: active ? "#c8a84b" : undefined,
+      }}
+    >
+      {label} {active ? (sortDir === "asc" ? "↑" : "↓") : <span style={{ opacity: 0.3 }}>↕</span>}
+    </th>
+  );
+}
+
 export default function QueuePage() {
   const [entries, setEntries]       = useState<QueueEntry[]>([]);
   const [songs, setSongs]           = useState<SongOption[]>([]);
@@ -46,6 +75,9 @@ export default function QueuePage() {
   const [saving, setSaving]         = useState<Record<number, boolean>>({});
   const [toast, setToast]           = useState<{ msg: string; type: "ok" | "err" } | null>(null);
   const [showForm, setShowForm]     = useState(false);
+  // Sort state for the queue table
+  const [sortField, setSortField]   = useState<string>("scheduled_at");
+  const [sortDir,   setSortDir]     = useState<"asc" | "desc">("asc");
   // Add-to-queue form state
   const [formSlug, setFormSlug]     = useState("");
   const [formDate, setFormDate]     = useState("");
@@ -55,6 +87,17 @@ export default function QueuePage() {
   function showToast(msg: string, type: "ok" | "err" = "err") {
     setToast({ msg, type });
     setTimeout(() => setToast(null), 3500);
+  }
+
+  /**
+   * handleSort — toggles sort direction if the field is already active,
+   * otherwise switches to the new field ascending.
+   *
+   * @param field - Sort key to activate.
+   */
+  function handleSort(field: string) {
+    if (field === sortField) setSortDir(d => d === "asc" ? "desc" : "asc");
+    else { setSortField(field); setSortDir("asc"); }
   }
 
   /** Fetch queue entries from /api/release_queue. */
@@ -148,7 +191,7 @@ export default function QueuePage() {
         throw new Error(err.detail ?? res.statusText);
       }
       const created: QueueEntry = await res.json();
-      setEntries(prev => [...prev, created].sort((a, b) => a.scheduled_at.localeCompare(b.scheduled_at)));
+      setEntries(prev => [...prev, created]);
       setShowForm(false);
       setFormSlug("");
       setFormDate("");
@@ -270,10 +313,11 @@ export default function QueuePage() {
           <table className="data-table">
             <thead>
               <tr>
-                <th>Song</th>
-                <th>Scheduled Date</th>
+                <SortableTH field="song_slug"    label="Song"   sortField={sortField} sortDir={sortDir} onSort={handleSort} />
+                <SortableTH field="scheduled_at" label="Date"   sortField={sortField} sortDir={sortDir} onSort={handleSort} />
+                {/* Platforms — not sortable */}
                 <th>Platforms</th>
-                <th>Status</th>
+                <SortableTH field="status"       label="Status" sortField={sortField} sortDir={sortDir} onSort={handleSort} />
                 <th></th>
               </tr>
             </thead>
@@ -284,8 +328,14 @@ export default function QueuePage() {
                     Queue is empty. Add a song above.
                   </td>
                 </tr>
-              ) : (
-                entries.map(entry => (
+              ) : (() => {
+                // Sort entries by active sort field (all three sortable fields are strings).
+                const sorted = [...entries].sort((a, b) => {
+                  const aStr = (a[sortField as keyof QueueEntry] as string) ?? "";
+                  const bStr = (b[sortField as keyof QueueEntry] as string) ?? "";
+                  return aStr.localeCompare(bStr) * (sortDir === "asc" ? 1 : -1);
+                });
+                return sorted.map(entry => (
                   <tr key={entry.id} style={{ opacity: (deleting[entry.id] || saving[entry.id]) ? 0.5 : 1 }}>
                     <td>
                       <div>{entry.song_title_pl}</div>
@@ -326,7 +376,7 @@ export default function QueuePage() {
                     </td>
                   </tr>
                 ))
-              )}
+              })()}
             </tbody>
           </table>
         </div>

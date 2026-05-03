@@ -82,5 +82,10 @@
     "rights":    "Wszelkie prawa zastrzeżone",
     "privacy":   "Polityka prywatności",
     "terms":     "Regulamin"
+  },
+  "songDetail": {
+    "watchOn":       "Obejrzyj na",
+    "listenSpotify": "Słuchaj na Spotify",
+    "sources":       "Źródła historyczne"
   }
 }

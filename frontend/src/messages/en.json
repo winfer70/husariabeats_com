@@ -82,5 +82,10 @@
     "rights":    "All rights reserved",
     "privacy":   "Privacy",
     "terms":     "Terms"
+  },
+  "songDetail": {
+    "watchOn":       "Watch on",
+    "listenSpotify": "Listen on Spotify",
+    "sources":       "Historical Sources"
   }
 }

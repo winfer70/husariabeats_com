@@ -227,6 +227,29 @@ async def create_song(body: SongCreate):
     return dict(row)
 
 
+@router.get("/songs/{slug}", response_model=SongOut)
+async def get_song(slug: str):
+    """
+    Fetch a single song by its slug.
+
+    Args:
+        slug: URL path parameter identifying the song.
+
+    Returns:
+        SongOut of the matching song.
+
+    Raises:
+        HTTPException 404 if no song with the given slug exists.
+    """
+    row = await db.fetch_one(
+        f"SELECT {_SELECT_COLS} FROM songs WHERE slug = :slug",
+        {"slug": slug},
+    )
+    if not row:
+        raise HTTPException(status_code=404, detail=f"Song '{slug}' not found")
+    return dict(row)
+
+
 @router.patch("/songs/{slug}", response_model=SongOut)
 async def update_song(slug: str, body: SongUpdate):
     """

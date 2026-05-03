@@ -108,7 +108,7 @@ export default async function AlbumDetailPage({ params: { locale, slug } }: Prop
             return (
               <Link
                 key={song.slug}
-                href={`/${locale}#${song.slug}`}
+                href={`/${locale}/songs/${song.slug}`}
                 style={{
                   display:    "flex",
                   alignItems: "center",

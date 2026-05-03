@@ -60,19 +60,24 @@ const getDaysUntil = (a: Album): number | null => {
 /* ── AlbumCover ────────────────────────────────────────────────────────────── */
 
 interface AlbumCoverProps {
-  album: Album;
-  L:     "PL" | "EN";
+  album:     Album;
+  L:         "PL" | "EN";
+  /** Optional image path — if provided, replaces generated SVG art */
+  coverSrc?: string;
 }
 
 /**
  * SVG album cover generated from the album's hue value.
+ * When `coverSrc` is given the generated art layers are replaced with the
+ * real image; the HUSARIABEATS wordmark and album title text are always kept.
  * Renders a radial gradient, diagonal stripe pattern, terrain silhouette,
- * HUSARIABEATS wordmark, album title, and a placeholder watermark.
+ * HUSARIABEATS wordmark, album title, and (when no image) a placeholder watermark.
  *
- * @param album - album data
- * @param L     - locale key for the title field
+ * @param album    - album data
+ * @param L        - locale key for the title field
+ * @param coverSrc - optional image path replacing generated art
  */
-function AlbumCover({ album, L }: AlbumCoverProps) {
+function AlbumCover({ album, L, coverSrc }: AlbumCoverProps) {
   const id  = `cov-${album.slug}`;
   const hue = album.hue ?? 36;
 
@@ -89,6 +94,10 @@ function AlbumCover({ album, L }: AlbumCoverProps) {
           <stop offset="0%"   stopColor={`oklch(0.42 0.12 ${hue})`} />
           <stop offset="100%" stopColor={`oklch(0.08 0.02 ${hue})`} />
         </radialGradient>
+        <linearGradient id={`${id}-l`} x1="0" y1="0" x2="0" y2="1">
+          <stop offset="0%"   stopColor={`oklch(0.28 0.08 ${hue})`} stopOpacity="0.4" />
+          <stop offset="100%" stopColor="#000" stopOpacity="0.75" />
+        </linearGradient>
         <pattern
           id={`${id}-stripes`}
           width="12"
@@ -105,13 +114,23 @@ function AlbumCover({ album, L }: AlbumCoverProps) {
         </pattern>
       </defs>
 
-      <rect width="400" height="400" fill={`url(#${id}-r)`} />
-      <rect width="400" height="400" fill={`url(#${id}-stripes)`} />
-      <path
-        d="M0 280 Q 100 220, 200 250 T 400 240 L 400 400 L 0 400 Z"
-        fill="#000"
-        opacity="0.55"
-      />
+      {/* Background — real image or generated art */}
+      {coverSrc ? (
+        <image href={coverSrc} x="0" y="0" width="440" height="440" preserveAspectRatio="xMidYMid slice" />
+      ) : (
+        <>
+          <rect width="400" height="400" fill={`url(#${id}-r)`} />
+          <rect width="400" height="400" fill={`url(#${id}-stripes)`} />
+          <path
+            d="M0 280 Q 100 220, 200 250 T 400 240 L 400 400 L 0 400 Z"
+            fill="#000"
+            opacity="0.55"
+          />
+        </>
+      )}
+
+      {/* Overlay gradient — always present for text readability */}
+      <rect width="400" height="400" fill={`url(#${id}-l)`} />
 
       <text
         x="200" y="190"
@@ -138,32 +157,37 @@ function AlbumCover({ album, L }: AlbumCoverProps) {
         {getTitle(album, L)}
       </text>
 
-      <g transform="translate(20, 20)" opacity="0.55">
-        <rect
-          width="180" height="18"
-          fill="rgba(0,0,0,0.6)"
-          stroke={`oklch(0.7 0.12 ${hue})`}
-          strokeWidth="0.4"
-        />
-        <text
-          x="8" y="13"
-          fill={`oklch(0.85 0.08 ${hue})`}
-          fontFamily="JetBrains Mono, monospace"
-          fontSize="8"
-          letterSpacing="1"
-        >
-          PLACEHOLDER · COVER ART
-        </text>
-      </g>
-      <text
-        x="20" y="380"
-        fill={`oklch(0.7 0.06 ${hue})`}
-        fontFamily="JetBrains Mono, monospace"
-        fontSize="9"
-        opacity="0.6"
-      >
-        {album.cover_label ?? ""}
-      </text>
+      {/* Placeholder watermark — only when no real image */}
+      {!coverSrc && (
+        <>
+          <g transform="translate(20, 20)" opacity="0.55">
+            <rect
+              width="180" height="18"
+              fill="rgba(0,0,0,0.6)"
+              stroke={`oklch(0.7 0.12 ${hue})`}
+              strokeWidth="0.4"
+            />
+            <text
+              x="8" y="13"
+              fill={`oklch(0.85 0.08 ${hue})`}
+              fontFamily="JetBrains Mono, monospace"
+              fontSize="8"
+              letterSpacing="1"
+            >
+              PLACEHOLDER · COVER ART
+            </text>
+          </g>
+          <text
+            x="20" y="380"
+            fill={`oklch(0.7 0.06 ${hue})`}
+            fontFamily="JetBrains Mono, monospace"
+            fontSize="9"
+            opacity="0.6"
+          >
+            {album.cover_label ?? ""}
+          </text>
+        </>
+      )}
     </svg>
   );
 }
@@ -282,11 +306,11 @@ function AlbumCard({ album, L, locale, t }: AlbumCardProps) {
         {/* Cover area */}
         <div style={{ position: "relative", aspectRatio: "1", background: "#000", overflow: "hidden" }}>
           {released ? (
-            <AlbumCover album={album} L={L} />
+            <AlbumCover album={album} L={L} coverSrc={`/images/albums/${album.slug}.jpg`} />
           ) : (
             <>
               <div style={{ position: "absolute", inset: 0, opacity: 0.35, filter: "blur(2px)" }}>
-                <AlbumCover album={album} L={L} />
+                <AlbumCover album={album} L={L} coverSrc={`/images/albums/${album.slug}.jpg`} />
               </div>
               <div style={{ position: "absolute", inset: 0, background: "rgba(10,10,12,0.6)" }} />
 

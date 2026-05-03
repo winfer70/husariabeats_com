@@ -335,7 +335,7 @@ function TimelineSection({ song, L, index, expanded, onToggle, t }: TimelineSect
     >
       {/* Parallax background layer */}
       <div style={{ position: "absolute", inset: 0, zIndex: 0 }}>
-        <HistBackground hue={hue} label={label} parallax={progress} />
+        <HistBackground hue={hue} label={label} parallax={progress} src={`/images/songs/${song.slug}.jpg`} />
         <div style={{
           position:   "absolute",
           inset:      0,

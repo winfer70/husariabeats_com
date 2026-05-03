@@ -12,6 +12,7 @@
 
 import { useState, useEffect, CSSProperties } from "react";
 import { useTranslations, useLocale } from "next-intl";
+import { useSearchParams } from "next/navigation";
 
 /* ── Constants ───────────────────────────────────────────────────────────── */
 
@@ -106,6 +107,7 @@ function TopicCard({
   voted,
   onVote,
   t,
+  showInboxHint,
 }: {
   topic:  Topic;
   rank:   number;
@@ -113,6 +115,8 @@ function TopicCard({
   onVote: () => void;
   /** Bound useTranslations("whatsNext") instance passed from parent. */
   t: ReturnType<typeof useTranslations>;
+  /** If true, show a brief "check your inbox" hint below the card. */
+  showInboxHint?: boolean;
 }) {
   const isFirst = rank === 1;
   const [hov, setHov] = useState(false);
@@ -142,7 +146,8 @@ function TopicCard({
   const displayCount = topic.vote_count + (voted ? 1 : 0);
 
   return (
-    <div
+    <>
+      <div
       onMouseEnter={() => setHov(true)}
       onMouseLeave={() => setHov(false)}
       style={{
@@ -241,6 +246,21 @@ function TopicCard({
         )}
       </div>
     </div>
+
+    {/* Inline "check inbox" hint — shown briefly after vote when email provided */}
+    {showInboxHint && (
+      <div style={{
+        fontFamily:    "var(--mono)",
+        fontSize:      10,
+        letterSpacing: "0.18em",
+        color:         "var(--gold)",
+        paddingTop:    6,
+        paddingLeft:   4,
+      }}>
+        ✉ {t("checkInbox")}
+      </div>
+    )}
+    </>
   );
 }
 
@@ -250,9 +270,12 @@ function TopicCard({
  */
 function SubmissionForm({
   onSubmit,
+  onEmailChange,
   t,
 }: {
-  onSubmit: (topic: Topic) => void;
+  onSubmit:      (topic: Topic) => void;
+  /** Called whenever the email input changes; used to lift email into parent. */
+  onEmailChange: (value: string) => void;
   t: ReturnType<typeof useTranslations>;
 }) {
   const [title,      setTitle]      = useState("");
@@ -411,7 +434,7 @@ function SubmissionForm({
           <input
             type="email"
             value={email}
-            onChange={(e) => setEmail(e.target.value)}
+            onChange={(e) => { setEmail(e.target.value); onEmailChange(e.target.value); }}
             onFocus={() => setFocused("email")}
             onBlur={() => setFocused("")}
             placeholder="ty@example.com"
@@ -468,14 +491,28 @@ function SubmissionForm({
  * Fetches topics from the API on mount; supports adding via form and voting.
  */
 export default function WhatsNextPage() {
-  const t      = useTranslations("whatsNext");
-  const locale = useLocale();
+  const t           = useTranslations("whatsNext");
+  const locale      = useLocale();
+  const searchParams = useSearchParams();
 
   /* Full list of topics from the API, mutable by optimistic adds/votes */
   const [topics,     setTopics]     = useState<Topic[]>([]);
   const [loading,    setLoading]    = useState(true);
   /** Set of topic IDs the current user has voted on (optimistic, in-memory) */
   const [localVoted, setLocalVoted] = useState<Set<number>>(new Set());
+  /** Email lifted from SubmissionForm; used to send real email on vote. */
+  const [voterEmail, setVoterEmail] = useState("");
+  /** Topic ID that was just voted on — drives brief "check inbox" hint. */
+  const [justVotedId, setJustVotedId] = useState<number | null>(null);
+  /** Banner state driven by ?subscribed= URL param. */
+  const [subscribedBanner, setSubscribedBanner] = useState<"confirmed" | "expired" | null>(null);
+
+  /* Handle ?subscribed= URL param on mount */
+  useEffect(() => {
+    const val = searchParams.get("subscribed");
+    if (val === "1") setSubscribedBanner("confirmed");
+    else if (val === "0") setSubscribedBanner("expired");
+  }, [searchParams]);
 
   /* Fetch topics on mount (GET /topics) */
   useEffect(() => {
@@ -496,6 +533,7 @@ export default function WhatsNextPage() {
   /**
    * Handle vote click for a topic.
    * Marks topic as voted optimistically, then fires the API call.
+   * Uses the lifted voterEmail if provided; falls back to anonymous placeholder.
    * @param topicId - ID of the topic to vote for
    */
   const handleVote = async (topicId: number) => {
@@ -504,14 +542,19 @@ export default function WhatsNextPage() {
     /* Optimistic update: mark as voted immediately */
     setLocalVoted((prev) => new Set(prev).add(topicId));
 
+    /* Show "check inbox" hint briefly if user provided their email */
+    if (voterEmail) {
+      setJustVotedId(topicId);
+      setTimeout(() => setJustVotedId(null), 5000);
+    }
+
     try {
-      /* email auth deferred — use anonymous placeholder */
       await fetch(`${API_BASE}/votes`, {
         method:  "POST",
         headers: { "Content-Type": "application/json" },
         body:    JSON.stringify({
           topic_id: topicId,
-          email:    "anonymous@husariabeats.com",
+          email:    voterEmail || "anonymous@husariabeats.com",
         }),
       });
     } catch {
@@ -532,6 +575,34 @@ export default function WhatsNextPage() {
 
   return (
     <div style={{ padding: "140px 36px 120px", maxWidth: 1440, margin: "0 auto" }}>
+
+      {/* ── Subscribed / expired banner (driven by ?subscribed= URL param) ── */}
+      {subscribedBanner && (
+        <div style={{
+          marginBottom:  24,
+          padding:       "14px 20px",
+          borderRadius:  4,
+          border:        `1px solid ${subscribedBanner === "confirmed" ? "#5fb4a2" : "rgba(200,100,100,0.5)"}`,
+          background:    subscribedBanner === "confirmed" ? "rgba(95,180,162,0.1)" : "rgba(200,100,100,0.1)",
+          fontFamily:    "var(--mono)",
+          fontSize:      11,
+          letterSpacing: "0.12em",
+          color:         subscribedBanner === "confirmed" ? "#5fb4a2" : "#c86464",
+          display:       "flex",
+          alignItems:    "center",
+          justifyContent:"space-between",
+        }}>
+          <span>
+            {subscribedBanner === "confirmed" ? t("subscribed") : t("subscribedError")}
+          </span>
+          <button
+            onClick={() => setSubscribedBanner(null)}
+            style={{ background: "none", border: "none", cursor: "pointer", color: "inherit", fontSize: 14 }}
+          >
+            ×
+          </button>
+        </div>
+      )}
 
       {/* ── Page header ── */}
       <div style={{ marginBottom: 64 }}>
@@ -581,7 +652,7 @@ export default function WhatsNextPage() {
       }}>
 
         {/* Left: sticky submission form */}
-        <SubmissionForm onSubmit={handleNewTopic} t={t} />
+        <SubmissionForm onSubmit={handleNewTopic} onEmailChange={setVoterEmail} t={t} />
 
         {/* Right: sorted topic list */}
         <div>
@@ -627,6 +698,7 @@ export default function WhatsNextPage() {
                   voted={localVoted.has(topic.id)}
                   onVote={() => handleVote(topic.id)}
                   t={t}
+                  showInboxHint={justVotedId === topic.id}
                 />
               ))
             )}

@@ -10,10 +10,13 @@
 
 from __future__ import annotations
 
+import asyncio
 import databases
 import redis.asyncio as aioredis
 from fastapi import APIRouter, HTTPException, Request
 from pydantic import BaseModel, Field
+
+from routers.notifications import notify_topic_subscribers
 
 # Injected by main.py lifespan
 db: databases.Database | None = None
@@ -153,4 +156,17 @@ async def update_topic(topic_id: int, body: TopicUpdate):
         """,
         {"id": topic_id},
     )
+
+    # Notify subscribers when status changes to in_development or released
+    new_status = updates.get("status")
+    if new_status in ("in_development", "released") and row:
+        asyncio.create_task(
+            notify_topic_subscribers(
+                db=db,
+                topic_id=topic_id,
+                topic_title=row["title"],
+                new_status=new_status,
+            )
+        )
+
     return dict(row)

@@ -5,3 +5,4 @@ databases[asyncpg]==0.9.0
 redis==5.0.4
 python-dotenv==1.0.1
 pydantic==2.7.1
+resend==2.6.0

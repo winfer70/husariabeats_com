@@ -6,6 +6,7 @@
 #   /api/songs         — GET list, PATCH update song
 #   /api/release_queue — GET/POST/PATCH/DELETE release queue
 #   /api/settings      — GET all settings, PUT upsert setting
+#   /api/vote_magic    — GET verify magic link token → creates vote subscription
 #
 # Environment variables (from .env via docker compose):
 #   DATABASE_URL  — asyncpg connection string
@@ -20,7 +21,7 @@ import redis.asyncio as aioredis
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
-from routers import topics, votes, songs, release_queue, settings, albums
+from routers import topics, votes, songs, release_queue, settings, albums, vote_magic
 
 DATABASE_URL = os.environ["DATABASE_URL"]
 REDIS_URL    = os.environ.get("REDIS_URL", "redis://redis:6379/0")
@@ -45,6 +46,8 @@ async def lifespan(app: FastAPI):
     release_queue.db = database
     settings.db      = database
     albums.db        = database
+    vote_magic.db    = database
+    vote_magic.redis = redis_client
 
     yield
 
@@ -72,6 +75,7 @@ app.include_router(songs.router,         prefix="/api")
 app.include_router(release_queue.router, prefix="/api")
 app.include_router(settings.router,      prefix="/api")
 app.include_router(albums.router,        prefix="/api")
+app.include_router(vote_magic.router,    prefix="/api")
 
 
 @app.get("/api/health")

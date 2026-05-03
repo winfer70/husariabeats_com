@@ -13,12 +13,15 @@
 
 from __future__ import annotations
 
+import asyncio
 import hashlib
 
 import databases
 import redis.asyncio as aioredis
 from fastapi import APIRouter, HTTPException
 from pydantic import BaseModel, EmailStr
+
+from routers import vote_magic as _vote_magic
 
 # Injected by main.py lifespan
 db:    databases.Database   | None = None
@@ -55,7 +58,7 @@ async def cast_vote(body: VoteRequest):
 
     # Verify topic exists
     topic = await db.fetch_one(
-        "SELECT id FROM topics WHERE id = :id", {"id": body.topic_id}
+        "SELECT id, title FROM topics WHERE id = :id", {"id": body.topic_id}
     )
     if not topic:
         raise HTTPException(status_code=404, detail="Topic not found")
@@ -71,6 +74,12 @@ async def cast_vote(body: VoteRequest):
 
     # Set Redis TTL after successful insert
     await redis.setex(redis_key, VOTE_TTL_SECONDS, "1")
+
+    # Dispatch magic link email if email is real (fire-and-forget)
+    if body.email != "anonymous@husariabeats.com":
+        asyncio.create_task(
+            _vote_magic.send_magic_link(str(body.email), body.topic_id, topic["title"])
+        )
 
     # Return updated vote count
     row = await db.fetch_one(

@@ -57,7 +57,10 @@
     "topChoice":    "★ TOP CHOICE",
     "devBadge":     "W produkcji",
     "releaseLabel": "Premiera",
-    "voteNote":     "1 głos / temat / 24h. Email służy tylko do weryfikacji — żadnego newslettera."
+    "voteNote":     "1 głos / temat / 24h. Email służy tylko do weryfikacji — żadnego newslettera.",
+    "subscribed":        "Subskrypcja potwierdzona! Dostaniesz powiadomienie.",
+    "subscribedError":   "Link wygasł. Zagłosuj ponownie.",
+    "voteCheckInbox":    "Sprawdź skrzynkę — czeka na Ciebie magic link."
   },
   "about": {
     "title":        "O kanale",

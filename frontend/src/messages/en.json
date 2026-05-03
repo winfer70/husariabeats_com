@@ -57,7 +57,10 @@
     "topChoice":    "★ TOP CHOICE",
     "devBadge":     "Under Development",
     "releaseLabel": "Release",
-    "voteNote":     "1 vote / topic / 24h. Email is only for verification — no newsletter."
+    "voteNote":     "1 vote / topic / 24h. Email is only for verification — no newsletter.",
+    "subscribed":        "Subscription confirmed! You'll be notified.",
+    "subscribedError":   "Link expired. Try voting again.",
+    "voteCheckInbox":    "Check your inbox for the magic link."
   },
   "about": {
     "title":        "About the channel",

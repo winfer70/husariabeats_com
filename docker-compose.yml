@@ -1,6 +1,13 @@
 # husariabeats.com — Docker Compose
 # Educational companion site for Husaria Beats YouTube channel.
-# Bilingual (PL/EN), timeline, album grid, community voting.
+# Bilingual (PL/EN), timeline, album grid, community voting, release automation.
+#
+# Services:
+#   frontend  — Next.js 14 public site      (127.0.0.1:3001)
+#   api       — FastAPI backend             (127.0.0.1:8001)
+#   admin     — Next.js admin panel         (127.0.0.1:3002, Cloudflare Access protected)
+#   db        — PostgreSQL 16               (internal only)
+#   redis     — Redis 7 vote dedup cache    (internal only)
 #
 # Usage:
 #   cp .env.example .env && nano .env
@@ -20,6 +27,8 @@ services:
       - "127.0.0.1:3001:3000"
     environment:
       - NEXT_PUBLIC_API_URL=https://husariabeats.com/api
+      - INTERNAL_API_URL=http://api:8000
+      - REVALIDATE_SECRET=${REVALIDATE_SECRET}
     depends_on:
       - api
     networks:
@@ -31,11 +40,27 @@ services:
     ports:
       - "127.0.0.1:8001:8000"
     env_file: .env
+    environment:
+      DATABASE_URL: "postgresql+asyncpg://${POSTGRES_USER}:${POSTGRES_PASSWORD}@db:5432/${POSTGRES_DB:-husariabeats}"
     depends_on:
       db:
         condition: service_healthy
       redis:
         condition: service_started
+    networks:
+      - husariabeats_net
+
+  admin:
+    build: ./admin
+    restart: unless-stopped
+    ports:
+      - "127.0.0.1:3002:3000"
+    environment:
+      # Internal Docker network URL for server-side API calls
+      - INTERNAL_API_URL=http://api:8000
+    depends_on:
+      - api
+      - db
     networks:
       - husariabeats_net
 

@@ -1,0 +1,1789 @@
+{
+  "updatedAt": "2026-05-03T15:34:41.039Z",
+  "createdAt": "2026-05-02T22:10:10.056Z",
+  "id": "bB7YCOGVtKm6oZz0",
+  "name": "HusariaBeats — Daily Release Automation",
+  "description": null,
+  "active": false,
+  "isArchived": false,
+  "nodes": [
+    {
+      "parameters": {
+        "method": "PUT",
+        "url": "https://www.googleapis.com/youtube/v3/videos",
+        "authentication": "predefinedCredentialType",
+        "nodeCredentialType": "googleOAuth2Api",
+        "sendQuery": true,
+        "queryParameters": {
+          "parameters": [
+            {
+              "name": "part",
+              "value": "snippet"
+            }
+          ]
+        },
+        "sendBody": true,
+        "options": {},
+        "sendHeaders": false,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Content-Type",
+              "value": "application/json"
+            }
+          ]
+        },
+        "contentType": "json",
+        "specifyBody": "json",
+        "jsonBody": "={{ { id: $json.uploadId, snippet: { title: $('Parse meta.json1').first().json.titleEn, description: $('Parse meta.json1').first().json.descriptionEn, tags: $('Parse meta.json1').first().json.tagsEn, categoryId: '10', defaultLanguage: 'en', defaultAudioLanguage: 'en' } } }}"
+      },
+      "id": "6737a1f7-132e-43e0-a875-6731c41ce218",
+      "name": "Patch YT EN Metadata1",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        34208,
+        5312
+      ],
+      "credentials": {
+        "googleOAuth2Api": {
+          "id": "Gth4fs6DIqCfOkJi",
+          "name": "HusariaBeats Google"
+        }
+      },
+      "notes": "Patches EN video: selfDeclaredMadeForKids=false, defaultAudioLanguage=en"
+    },
+    {
+      "parameters": {
+        "method": "PUT",
+        "url": "https://www.googleapis.com/youtube/v3/videos",
+        "authentication": "predefinedCredentialType",
+        "nodeCredentialType": "googleOAuth2Api",
+        "sendQuery": true,
+        "queryParameters": {
+          "parameters": [
+            {
+              "name": "part",
+              "value": "snippet"
+            }
+          ]
+        },
+        "sendBody": true,
+        "options": {},
+        "sendHeaders": false,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Content-Type",
+              "value": "application/json"
+            }
+          ]
+        },
+        "contentType": "json",
+        "specifyBody": "json",
+        "jsonBody": "={{ { id: $json.uploadId, snippet: { title: $('Parse meta.json1').first().json.titlePl, description: $('Parse meta.json1').first().json.descriptionPl, tags: $('Parse meta.json1').first().json.tagsPl, categoryId: '10', defaultLanguage: 'pl', defaultAudioLanguage: 'pl' } } }}"
+      },
+      "id": "4fa8d7e1-9fd1-4b3b-9a8e-6304ca085b73",
+      "name": "Patch YT PL Metadata1",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        33200,
+        5312
+      ],
+      "credentials": {
+        "googleOAuth2Api": {
+          "id": "Gth4fs6DIqCfOkJi",
+          "name": "HusariaBeats Google"
+        }
+      },
+      "notes": "Patches PL video: selfDeclaredMadeForKids=false, defaultAudioLanguage=pl"
+    },
+    {
+      "parameters": {
+        "method": "PATCH",
+        "url": "={{ 'https://husariabeats.com/api/songs/' + $('TikTok Post (STUB)1').first().json.song.slug }}",
+        "sendBody": true,
+        "options": {},
+        "specifyBody": "json",
+        "jsonBody": "={{ JSON.stringify({ status: 'released', release_date: $now.format('yyyy-MM-dd') }) }}"
+      },
+      "id": "0cefb4ad-ff7b-449a-8be2-4cabb24fc4e5",
+      "name": "Mark Song Released1",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        35296,
+        5312
+      ],
+      "notes": "Sets songs.status = 'released' after queue entry is marked."
+    },
+    {
+      "parameters": {
+        "method": "PATCH",
+        "url": "={{ 'https://husariabeats.com/api/release_queue/' + $json.queueItem.id }}",
+        "sendBody": true,
+        "options": {},
+        "specifyBody": "json",
+        "jsonBody": "{\"status\":\"released\"}"
+      },
+      "id": "1ba65e82-cd1b-40cc-8cc8-e2d8534498ef",
+      "name": "Mark Queue Released1",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        35104,
+        5312
+      ],
+      "notes": "Sets release_queue.status = 'released' after all posts attempted."
+    },
+    {
+      "parameters": {
+        "jsCode": "// ══════════════════════════════════════════════════════════\n// PLACEHOLDER: TikTok Post\n// ══════════════════════════════════════════════════════════\n// Requires: video.publish scope approved in TikTok Content API audit\n//\n// When ready:\n//   1. POST https://open.tiktokapis.com/v2/post/publish/video/init/\n//      Body: { post_info: {...}, source_info: { source: 'FILE_UPLOAD' } }\n//   2. Upload video file\n//   3. POST .../complete/\n// ══════════════════════════════════════════════════════════\n\nconst { song, queueItem, youtubeId } = $input.first().json;\nconsole.log('TODO: Post to TikTok for song:', song.slug);\n\nreturn [{ json: { queueItem, song, youtubeId, tiktokPosted: false, tiktokSkipped: true } }];"
+      },
+      "id": "65176f6e-7e1c-4ae2-a10d-b2e9fd635eee",
+      "name": "TikTok Post (STUB)1",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        34896,
+        5312
+      ],
+      "notes": "STUB — replace with TikTok Content API nodes when audit approved."
+    },
+    {
+      "parameters": {
+        "jsCode": "// ══════════════════════════════════════════════════════════\n// PLACEHOLDER: Instagram Post\n// ══════════════════════════════════════════════════════════\n// Requires: instagram_content_publish permission approved in Meta App Review\n// Instagram Business account must be linked to Facebook Page\n//\n// When ready:\n//   1. POST https://graph.facebook.com/v18.0/{ig-user-id}/media\n//      Body: { media_type: 'REELS', video_url: ..., caption: ... }\n//   2. POST https://graph.facebook.com/v18.0/{ig-user-id}/media_publish\n//      Body: { creation_id: ... }\n// ══════════════════════════════════════════════════════════\n\nconst { song, queueItem, youtubeId } = $input.first().json;\nconsole.log('TODO: Post to Instagram for song:', song.slug);\n\nreturn [{ json: { queueItem, song, youtubeId, igPosted: false, igSkipped: true } }];"
+      },
+      "id": "83d7a0ec-9c4e-4e8b-b06b-4699198a13d9",
+      "name": "Instagram Post (STUB)1",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        34704,
+        5312
+      ],
+      "notes": "STUB — replace with Instagram Graph API nodes when Meta App Review approved."
+    },
+    {
+      "parameters": {
+        "jsCode": "// ══════════════════════════════════════════════════════════\n// PLACEHOLDER: Facebook Page Post\n// ══════════════════════════════════════════════════════════\n// Requires: pages_manage_posts permission approved in Meta App Review\n//\n// When ready, replace with:\n//   - HTTP Request to https://graph.facebook.com/v18.0/{page-id}/feed\n//   - Auth: Page Access Token (long-lived, from Meta)\n//   - Body: { message: caption, link: 'https://youtu.be/' + youtubeId }\n// ══════════════════════════════════════════════════════════\n\nconst song = $('Parse meta.json1').first().json.song;\nconst queueItem = $('Parse meta.json1').first().json.queueItem;\nconst youtubeId = $('Upload to YouTube1').first().json.id;\nconsole.log('TODO: Post to Facebook for song:', song.slug, '| YouTube:', youtubeId);\n\nreturn [{ json: { queueItem, song, youtubeId, fbPosted: false, fbSkipped: true } }];"
+      },
+      "id": "9b6d2205-a648-4c5b-bb56-d2b84d6e6c27",
+      "name": "Facebook Post (STUB)1",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        34496,
+        5312
+      ],
+      "notes": "STUB — replace with FB Graph API HTTP node when Meta App Review approved."
+    },
+    {
+      "parameters": {
+        "method": "PATCH",
+        "url": "={{ 'https://husariabeats.com/api/songs/' + $('Parse meta.json1').first().json.song.slug }}",
+        "sendBody": true,
+        "options": {},
+        "specifyBody": "json",
+        "jsonBody": "={{ JSON.stringify({ youtube_id_en: $json.id }) }}"
+      },
+      "id": "acc3ea8f-45b9-4909-bb75-2c81c94d93a0",
+      "name": "Save YouTube ID EN1",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        34304,
+        5312
+      ],
+      "notes": "PATCHes songs.youtube_id_en with the uploaded EN video's YouTube ID."
+    },
+    {
+      "parameters": {
+        "resource": "video",
+        "operation": "upload",
+        "title": "={{ $('Parse meta.json1').first().json.titleEn }}",
+        "regionCode": "PL",
+        "categoryId": "10",
+        "options": {
+          "defaultLanguage": "en",
+          "description": "={{ $('Parse meta.json1').first().json.descriptionEn }}",
+          "privacyStatus": "private",
+          "tags": "={{ $('Parse meta.json1').first().json.tagsEn }}"
+        }
+      },
+      "id": "4add1ec8-56c7-4aa8-a8ee-d71dc45c3cac",
+      "name": "Upload EN to YouTube1",
+      "type": "n8n-nodes-base.youTube",
+      "typeVersion": 1,
+      "position": [
+        34096,
+        5312
+      ],
+      "credentials": {
+        "youTubeOAuth2Api": {
+          "id": "aNLQrUlbyvr5J2HH",
+          "name": "YouTube account"
+        }
+      },
+      "notes": "Uploads English video to YouTube using title_en/description_en/tags_en from meta.json."
+    },
+    {
+      "parameters": {
+        "url": "={{ 'https://www.googleapis.com/drive/v3/files/' + $json.videoEnFileId + '?alt=media' }}",
+        "authentication": "predefinedCredentialType",
+        "nodeCredentialType": "googleOAuth2Api",
+        "options": {
+          "response": {
+            "response": {
+              "responseFormat": "file"
+            }
+          }
+        }
+      },
+      "id": "730df16e-185c-4ea2-b00d-c09918adc132",
+      "name": "Download EN Video from Drive1",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        33904,
+        5312
+      ],
+      "credentials": {
+        "googleOAuth2Api": {
+          "id": "Gth4fs6DIqCfOkJi",
+          "name": "HusariaBeats Google"
+        }
+      },
+      "notes": "Downloads video_en.mp4 binary from Google Drive."
+    },
+    {
+      "parameters": {
+        "jsCode": "const slug = $('Extract Song Details1').first().json.song.slug;\nconst files = $input.first().json.files || [];\nif (!files.length) {\n  throw new Error(`video_en.mp4 not found in Drive folder for slug '${slug}'. Upload it to husariabeats-releases/${slug}/video_en.mp4`);\n}\nreturn [{ json: { videoEnFileId: files[0].id, slug } }];"
+      },
+      "id": "740ae370-2683-412f-bc64-d21495876aa5",
+      "name": "Extract EN Video File ID1",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        33696,
+        5312
+      ],
+      "notes": "Extracts video_en.mp4 file ID. Throws if missing."
+    },
+    {
+      "parameters": {
+        "url": "https://www.googleapis.com/drive/v3/files",
+        "authentication": "predefinedCredentialType",
+        "nodeCredentialType": "googleOAuth2Api",
+        "sendQuery": true,
+        "queryParameters": {
+          "parameters": [
+            {
+              "name": "q",
+              "value": "={{ \"name = 'video_en.mp4' and '\" + $('Parse meta.json1').first().json.folderId + \"' in parents\" }}"
+            },
+            {
+              "name": "fields",
+              "value": "files(id,name)"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "e2aeb314-50cd-41c7-8eaa-646d2b6eb1d3",
+      "name": "Find video_en.mp",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        33504,
+        5312
+      ],
+      "credentials": {
+        "googleOAuth2Api": {
+          "id": "Gth4fs6DIqCfOkJi",
+          "name": "HusariaBeats Google"
+        }
+      },
+      "notes": "Searches for video_en.mp4 inside the song's release subfolder."
+    },
+    {
+      "parameters": {
+        "method": "PATCH",
+        "url": "={{ 'https://husariabeats.com/api/songs/' + $('Parse meta.json1').first().json.song.slug }}",
+        "sendBody": true,
+        "options": {},
+        "specifyBody": "json",
+        "jsonBody": "={{ JSON.stringify({ youtube_id_pl: $json.id }) }}"
+      },
+      "id": "094c11bc-39d8-454e-9e8f-c94ece621c03",
+      "name": "Save YouTube ID1",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        33296,
+        5312
+      ],
+      "notes": "PATCHes songs.youtube_id_pl with the uploaded video's YouTube ID."
+    },
+    {
+      "parameters": {
+        "resource": "video",
+        "operation": "upload",
+        "title": "={{ $('Parse meta.json1').first().json.titlePl }}",
+        "regionCode": "PL",
+        "categoryId": "10",
+        "options": {
+          "defaultLanguage": "pl",
+          "description": "={{ $('Parse meta.json1').first().json.descriptionPl }}",
+          "privacyStatus": "private",
+          "tags": "={{ $('Parse meta.json1').first().json.tagsPl }}"
+        }
+      },
+      "id": "73c465d8-be97-4e38-a761-eaf1ce16ecf1",
+      "name": "Upload to YouTube1",
+      "type": "n8n-nodes-base.youTube",
+      "typeVersion": 1,
+      "position": [
+        33104,
+        5312
+      ],
+      "credentials": {
+        "youTubeOAuth2Api": {
+          "id": "aNLQrUlbyvr5J2HH",
+          "name": "YouTube account"
+        }
+      },
+      "notes": "Uploads PL video to YouTube using titlePl/descriptionPl/tagsPl from meta.json. Requires 'HusariaBeats YouTube' credential (YouTube OAuth2 API type)."
+    },
+    {
+      "parameters": {
+        "url": "={{ 'https://www.googleapis.com/drive/v3/files/' + $json.videoFileId + '?alt=media' }}",
+        "authentication": "predefinedCredentialType",
+        "nodeCredentialType": "googleOAuth2Api",
+        "options": {
+          "response": {
+            "response": {
+              "responseFormat": "file"
+            }
+          }
+        }
+      },
+      "id": "1b5f4bbc-a4f3-49ed-bb9c-59e51144c65d",
+      "name": "Download Video from Drive1",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        32896,
+        5312
+      ],
+      "credentials": {
+        "googleOAuth2Api": {
+          "id": "Gth4fs6DIqCfOkJi",
+          "name": "HusariaBeats Google"
+        }
+      },
+      "notes": "Downloads video.mp4 binary from Google Drive. Outputs to binary property 'data'."
+    },
+    {
+      "parameters": {
+        "jsCode": "// Parse meta.json and build YouTube upload context for both PL and EN.\n// Required meta.json fields:\n//   title_pl, title_en         — YouTube video titles\n//   description_pl             — Polish description\n//   description_en             — English description\n//   tags_pl, tags_en           — YouTube tags arrays\n\nconst song = $('Extract Song Details1').first().json.song;\nconst queueItem = $('Extract Song Details1').first().json.queueItem;\nconst videoFileId = $('Extract Video File ID1').first().json.videoFileId;\nconst folderId = $('Extract Folder ID1').first().json.folderId;\n\nlet meta;\ntry {\n  meta = JSON.parse($input.first().json.data);\n} catch(e) {\n  throw new Error(`meta.json is not valid JSON: ${e.message}`);\n}\n\n// Validate required PL fields\nif (!meta.title_pl) throw new Error('meta.json missing: title_pl');\nif (!meta.description_pl) throw new Error('meta.json missing: description_pl');\nif (!meta.tags_pl || !meta.tags_pl.length) throw new Error('meta.json missing: tags_pl (array)');\n\n// Validate required EN fields\nif (!meta.title_en) throw new Error('meta.json missing: title_en');\nif (!meta.description_en) throw new Error('meta.json missing: description_en');\nif (!meta.tags_en || !meta.tags_en.length) throw new Error('meta.json missing: tags_en (array)');\n\n// Build PL upload data\nconst descPlParts = [meta.description_pl];\nconst descPl = descPlParts.join('\\n\\n');\nconst tagsPl = Array.isArray(meta.tags_pl) ? meta.tags_pl.join(',') : meta.tags_pl;\n\n// Build EN upload data\nconst descEnParts = [meta.description_en];\nconst descEn = descEnParts.join('\\n\\n');\n\n// Optional album playlist fields\nconst albumNamePl = meta.album_name_pl || null;\nconst albumNameEn = meta.album_name_en || null;\nconst tagsEn = Array.isArray(meta.tags_en) ? meta.tags_en.join(',') : meta.tags_en;\n\nreturn [{ json: {\n  videoFileId, folderId,\n  titlePl: meta.title_pl, descriptionPl: descPl, tagsPl,\n  titleEn: meta.title_en, descriptionEn: descEn, tagsEn,\n  song, queueItem,\n  albumNamePl, albumNameEn\n} }];"
+      },
+      "id": "07f42ac7-966e-4f67-b3d8-25d3248cf03d",
+      "name": "Parse meta.json1",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        32704,
+        5312
+      ],
+      "notes": "Parses meta.json text into YouTube upload fields for PL and EN. Validates all required fields."
+    },
+    {
+      "parameters": {
+        "url": "={{ 'https://www.googleapis.com/drive/v3/files/' + $json.metaFileId + '?alt=media' }}",
+        "authentication": "predefinedCredentialType",
+        "nodeCredentialType": "googleOAuth2Api",
+        "options": {
+          "response": {
+            "response": {
+              "responseFormat": "text"
+            }
+          }
+        }
+      },
+      "id": "ca82d730-c7c4-4eaa-9ff3-c1325cc88fb4",
+      "name": "Download meta.json1",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        32496,
+        5312
+      ],
+      "credentials": {
+        "googleOAuth2Api": {
+          "id": "Gth4fs6DIqCfOkJi",
+          "name": "HusariaBeats Google"
+        }
+      },
+      "notes": "Downloads meta.json as raw text from Drive."
+    },
+    {
+      "parameters": {
+        "jsCode": "// Extract meta.json file ID. Throw if missing — meta.json is required.\nconst slug = $('Extract Song Details1').first().json.song.slug;\nconst videoFileId = $('Extract Video File ID1').first().json.videoFileId;\nconst files = $input.first().json.files || [];\nif (!files.length) {\n  throw new Error(`meta.json not found in Drive folder for slug '${slug}'. Create husariabeats-releases/${slug}/meta.json with title_pl, description_pl, description_en, tags fields.`);\n}\nreturn [{ json: { metaFileId: files[0].id, videoFileId, slug } }];"
+      },
+      "id": "d7bef0b1-3918-432f-b51a-e983c6a3f26d",
+      "name": "Extract meta.json ID1",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        32304,
+        5312
+      ],
+      "notes": "Extracts meta.json file ID. Throws if missing — meta.json is required for every release."
+    },
+    {
+      "parameters": {
+        "url": "https://www.googleapis.com/drive/v3/files",
+        "authentication": "predefinedCredentialType",
+        "nodeCredentialType": "googleOAuth2Api",
+        "sendQuery": true,
+        "queryParameters": {
+          "parameters": [
+            {
+              "name": "q",
+              "value": "={{ \"name = 'meta.json' and '\" + $json.folderId + \"' in parents\" }}"
+            },
+            {
+              "name": "fields",
+              "value": "files(id,name)"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "332456ae-3487-493c-b08a-a94cea8c5634",
+      "name": "Find meta.json1",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        32096,
+        5312
+      ],
+      "credentials": {
+        "googleOAuth2Api": {
+          "id": "Gth4fs6DIqCfOkJi",
+          "name": "HusariaBeats Google"
+        }
+      },
+      "notes": "Searches for meta.json in song's release subfolder."
+    },
+    {
+      "parameters": {
+        "jsCode": "// Extract video file ID. Also carry folderId forward for meta.json search.\nconst slug = $('Extract Song Details1').first().json.song.slug;\nconst folderId = $('Extract Folder ID1').first().json.folderId;\nconst files = $input.first().json.files || [];\nif (!files.length) {\n  throw new Error(`video_pl.mp4 not found in Drive folder for slug '${slug}'. Upload it to husariabeats-releases/${slug}/video_pl.mp4`);\n}\nreturn [{ json: { videoFileId: files[0].id, folderId, slug } }];"
+      },
+      "id": "1c334c0b-0422-48a4-9ee4-fe1a0105b224",
+      "name": "Extract Video File ID1",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        31904,
+        5312
+      ],
+      "notes": "Extracts video.mp4 file ID. Carries folderId forward for meta.json lookup."
+    },
+    {
+      "parameters": {
+        "url": "https://www.googleapis.com/drive/v3/files",
+        "authentication": "predefinedCredentialType",
+        "nodeCredentialType": "googleOAuth2Api",
+        "sendQuery": true,
+        "queryParameters": {
+          "parameters": [
+            {
+              "name": "q",
+              "value": "={{ \"name = 'video_pl.mp4' and '\" + $json.folderId + \"' in parents\" }}"
+            },
+            {
+              "name": "fields",
+              "value": "files(id,name)"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "bff2fe91-9438-459c-b660-c247018653ab",
+      "name": "Find video_pl.mp",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        31696,
+        5312
+      ],
+      "credentials": {
+        "googleOAuth2Api": {
+          "id": "Gth4fs6DIqCfOkJi",
+          "name": "HusariaBeats Google"
+        }
+      },
+      "notes": "Searches for video.mp4 inside the song's release subfolder."
+    },
+    {
+      "parameters": {
+        "jsCode": "// Extract folder ID from Drive search result\nconst slug = $('Extract Song Details1').first().json.song.slug;\nconst files = $input.first().json.files || [];\nif (!files.length) {\n  throw new Error(`Drive folder '${slug}' not found in husariabeats-releases. Create folder husariabeats-releases/${slug}/ and upload video.mp4 + meta.json.`);\n}\nreturn [{ json: { folderId: files[0].id, slug } }];"
+      },
+      "id": "3ca59d44-37c7-4987-924c-e39f93f9511d",
+      "name": "Extract Folder ID1",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        31504,
+        5312
+      ],
+      "notes": "Extracts folder ID from Drive search result. Throws if folder missing."
+    },
+    {
+      "parameters": {
+        "url": "https://www.googleapis.com/drive/v3/files",
+        "authentication": "predefinedCredentialType",
+        "nodeCredentialType": "googleOAuth2Api",
+        "sendQuery": true,
+        "queryParameters": {
+          "parameters": [
+            {
+              "name": "q",
+              "value": "={{ \"name = '\" + $json.song.slug + \"' and '10rTP6kmXiKeHd2vB7jYZTlm-0kSz9vSO' in parents and mimeType = 'application/vnd.google-apps.folder'\" }}"
+            },
+            {
+              "name": "fields",
+              "value": "files(id,name)"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "a3972cf6-b7d7-4615-a5dd-6a92e986f4f4",
+      "name": "Find Release Folder1",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        31296,
+        5312
+      ],
+      "credentials": {
+        "googleOAuth2Api": {
+          "id": "Gth4fs6DIqCfOkJi",
+          "name": "HusariaBeats Google"
+        }
+      },
+      "notes": "Searches husariabeats-releases Drive folder for subfolder matching song slug."
+    },
+    {
+      "parameters": {
+        "jsCode": "// Find the specific song from the queue item\n// n8n splits array HTTP response into individual items — use $input.all()\n// DB column is song_id (not song_slug)\nconst queueItem = $('Restore Queue Item1').first().json.item;\nconst songs = $input.all().map(i => i.json);\nconst songId = queueItem.song_id || queueItem.song_slug;\nconst song = songs.find(s => s.slug === songId);\n\nif (!song) {\n  throw new Error(`Song '${songId}' not found in songs list`);\n}\n\nreturn [{ json: { queueItem, song } }];"
+      },
+      "id": "887d6937-455b-4060-85af-9fdc3aba7f1b",
+      "name": "Extract Song Details1",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        31104,
+        5312
+      ],
+      "notes": "Finds song record from songs list by slug. Provides queueItem + song to downstream."
+    },
+    {
+      "parameters": {
+        "url": "https://husariabeats.com/api/songs",
+        "options": {}
+      },
+      "id": "fa7c43b3-669b-4a29-8552-a30455a35904",
+      "name": "Get Songs List1",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        30896,
+        5312
+      ],
+      "notes": "Gets all songs. Filter by slug in next node to get song details."
+    },
+    {
+      "parameters": {
+        "method": "PATCH",
+        "url": "={{ 'https://husariabeats.com/api/release_queue/' + $json.item.id }}",
+        "sendBody": true,
+        "bodyParameters": {
+          "parameters": [
+            {}
+          ]
+        },
+        "options": {}
+      },
+      "id": "0b4710b9-0bf0-4d3b-a9b4-e956f16a3cf2",
+      "name": "Mark Releasing1",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        30704,
+        5312
+      ],
+      "notes": "Sets release_queue status to 'releasing' before upload attempt."
+    },
+    {
+      "parameters": {
+        "jsCode": "// Re-surfaces the queue item after the kill-switch IF branch\nconst item = $('Find Today\\'s Release1').first().json.item;\nreturn [{ json: { item } }];"
+      },
+      "id": "f4b53063-2c9e-40aa-a4ea-4cd1ff9a70e3",
+      "name": "Restore Queue Item1",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        30496,
+        5312
+      ],
+      "notes": "Re-surfaces queue item data after the kill-switch IF branch."
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict"
+          },
+          "conditions": [
+            {
+              "id": "kill-switch-check",
+              "leftValue": "={{ $json.auto_release_enabled }}",
+              "rightValue": "true",
+              "operator": {
+                "type": "string",
+                "operation": "equals"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "id": "abbfdf29-778b-49c7-8b03-69ae0e6d5876",
+      "name": "Kill Switch On?1",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2,
+      "position": [
+        30304,
+        5312
+      ],
+      "notes": "auto_release_enabled must be 'true'. Stops if kill switch is off."
+    },
+    {
+      "parameters": {
+        "url": "https://husariabeats.com/api/settings",
+        "options": {}
+      },
+      "id": "745bf851-f7e3-43c7-8d8b-16f0221f1e69",
+      "name": "Get Settings1",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        30096,
+        5312
+      ],
+      "notes": "Fetches settings dict. Check auto_release_enabled kill switch."
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict"
+          },
+          "conditions": [
+            {
+              "id": "has-item-check",
+              "leftValue": "={{ $json.hasItem }}",
+              "rightValue": true,
+              "operator": {
+                "type": "boolean",
+                "operation": "equals"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "id": "b2668c67-f7a5-4aa9-afe3-91f31e53926a",
+      "name": "Has Today's Release?1",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2,
+      "position": [
+        29904,
+        5424
+      ],
+      "notes": "True → continue. False → stop (no release today)."
+    },
+    {
+      "parameters": {
+        "jsCode": "// Filter for queued items scheduled today (Warsaw time)\n// n8n splits array HTTP response into individual items — iterate directly\nconst today = new Date().toLocaleDateString('sv-SE', { timeZone: 'Europe/Warsaw' });\nconst items = $input.all();\n\nconst todayItem = items\n  .map(i => i.json)\n  .find(e => {\n    const scheduledDate = e.scheduled_at ? String(e.scheduled_at).substring(0, 10) : null;\n    return e.status === 'queued' && scheduledDate === today;\n  });\n\nif (!todayItem) {\n  return [{ json: { hasItem: false } }];\n}\nreturn [{ json: { hasItem: true, item: todayItem } }];"
+      },
+      "id": "dcb56d24-8a72-4860-b0bb-036f8e8b4c25",
+      "name": "Find Today's Release1",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        29696,
+        5424
+      ],
+      "notes": "Finds pending queue item scheduled for today. Returns hasItem bool."
+    },
+    {
+      "parameters": {
+        "url": "https://husariabeats.com/api/release_queue",
+        "options": {}
+      },
+      "id": "5440ef22-dc05-44c5-b76d-00360ee50904",
+      "name": "Get Release Queue1",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        29504,
+        5424
+      ],
+      "notes": "Fetches all queue entries. Filter pending + today in next node."
+    },
+    {
+      "parameters": {
+        "rule": {
+          "interval": [
+            {
+              "field": "cronExpression",
+              "expression": "0 9 * * *"
+            }
+          ]
+        }
+      },
+      "id": "97bb0411-7b95-4c7d-a8fb-724cbbaa8960",
+      "name": "Daily 09:00 Warsaw1",
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "typeVersion": 1.2,
+      "position": [
+        29296,
+        5424
+      ]
+    },
+    {
+      "id": "9a196f71-ace2-49a3-9634-88b2bec69d1c",
+      "name": "Add to Polska Playlist1",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        33200,
+        5512
+      ],
+      "credentials": {
+        "googleOAuth2Api": {
+          "id": "Gth4fs6DIqCfOkJi",
+          "name": "HusariaBeats Google"
+        }
+      },
+      "parameters": {
+        "method": "POST",
+        "url": "https://www.googleapis.com/youtube/v3/playlistItems",
+        "authentication": "predefinedCredentialType",
+        "nodeCredentialType": "googleOAuth2Api",
+        "sendQuery": true,
+        "queryParameters": {
+          "parameters": [
+            {
+              "name": "part",
+              "value": "snippet"
+            }
+          ]
+        },
+        "sendBody": true,
+        "contentType": "json",
+        "specifyBody": "json",
+        "jsonBody": "={{ { snippet: { playlistId: 'PLR97NEdUHE6jSQuewn0WqjpfBmsyUqO_w', resourceId: { kind: 'youtube#video', videoId: $json.id } } } }}",
+        "options": {}
+      }
+    },
+    {
+      "id": "144ef118-f13e-441c-8591-0cdd75eecc20",
+      "name": "Resolve PL Album Playlist1",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        33200,
+        5712
+      ],
+      "parameters": {
+        "jsCode": "// Fetch album playlist IDs from husariabeats DB API\n// Uses album_name_pl from meta.json as album key (slug derived from song's album_slug)\nconst albumNamePl = $('Parse meta.json1').first().json.albumNamePl;\nif (!albumNamePl) return []; // no album defined, skip\n\nconst song = $('Parse meta.json1').first().json.song;\nconst albumSlug = song.album_slug;\nif (!albumSlug) return []; // song not linked to album in DB, skip\n\n// albumSlug is used as DB key; albumNamePl used as playlist title if creating\nreturn [{ json: {\n  albumSlug,\n  albumNamePl,\n  videoId: $input.first().json.id\n} }];"
+      }
+    },
+    {
+      "id": "839dbd96-d4c1-42e8-b003-02c8cc9ec467",
+      "name": "IF Create PL Playlist1",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2,
+      "position": [
+        33200,
+        5912
+      ],
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "loose"
+          },
+          "conditions": [
+            {
+              "id": "3ad0c1d0-35bf-4daa-be53-3d1171062465",
+              "leftValue": "={{ $json.youtube_playlist_id_pl }}",
+              "rightValue": "",
+              "operator": {
+                "type": "string",
+                "operation": "empty",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "and"
+        }
+      }
+    },
+    {
+      "id": "175931cd-56e8-4247-a936-3c710d032b54",
+      "name": "Create Album PL Playlist1",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        33000,
+        6112
+      ],
+      "credentials": {
+        "googleOAuth2Api": {
+          "id": "Gth4fs6DIqCfOkJi",
+          "name": "HusariaBeats Google"
+        }
+      },
+      "parameters": {
+        "method": "POST",
+        "url": "https://www.googleapis.com/youtube/v3/playlists",
+        "authentication": "predefinedCredentialType",
+        "nodeCredentialType": "googleOAuth2Api",
+        "sendQuery": true,
+        "queryParameters": {
+          "parameters": [
+            {
+              "name": "part",
+              "value": "snippet,status"
+            }
+          ]
+        },
+        "sendBody": true,
+        "contentType": "json",
+        "specifyBody": "json",
+        "jsonBody": "={{ { snippet: { title: $('Resolve PL Album Playlist1').first().json.albumNamePl, defaultLanguage: 'pl' }, status: { privacyStatus: 'public' } } }}",
+        "options": {}
+      },
+      "notes": "Creates new YouTube album playlist (PL). Runs only when playlist doesn't exist yet."
+    },
+    {
+      "id": "255e474f-0b4a-4064-a388-2c3fcf9a410f",
+      "name": "Save PL Playlist ID1",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        33000,
+        6312
+      ],
+      "parameters": {
+        "method": "PATCH",
+        "url": "={{ 'https://husariabeats.com/api/albums/' + $('Resolve PL Album Playlist1').first().json.albumSlug }}",
+        "sendBody": true,
+        "contentType": "json",
+        "specifyBody": "json",
+        "jsonBody": "={{ { youtube_playlist_id_pl: $json.id } }}",
+        "options": {}
+      }
+    },
+    {
+      "id": "fca94b5e-fbbc-4ea6-9484-e396b421ad95",
+      "name": "Add to New Album PL Playlist1",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        33000,
+        6512
+      ],
+      "credentials": {
+        "googleOAuth2Api": {
+          "id": "Gth4fs6DIqCfOkJi",
+          "name": "HusariaBeats Google"
+        }
+      },
+      "parameters": {
+        "method": "POST",
+        "url": "https://www.googleapis.com/youtube/v3/playlistItems",
+        "authentication": "predefinedCredentialType",
+        "nodeCredentialType": "googleOAuth2Api",
+        "sendQuery": true,
+        "queryParameters": {
+          "parameters": [
+            {
+              "name": "part",
+              "value": "snippet"
+            }
+          ]
+        },
+        "sendBody": true,
+        "contentType": "json",
+        "specifyBody": "json",
+        "jsonBody": "={{ { snippet: { playlistId: $json.youtube_playlist_id_pl, resourceId: { kind: 'youtube#video', videoId: $('Resolve PL Album Playlist1').first().json.videoId } } } }}",
+        "options": {}
+      }
+    },
+    {
+      "id": "f5518ed9-12a8-4dd7-b9c5-4718acbe2085",
+      "name": "Add to Existing Album PL Playlist1",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        33400,
+        6112
+      ],
+      "credentials": {
+        "googleOAuth2Api": {
+          "id": "Gth4fs6DIqCfOkJi",
+          "name": "HusariaBeats Google"
+        }
+      },
+      "parameters": {
+        "method": "POST",
+        "url": "https://www.googleapis.com/youtube/v3/playlistItems",
+        "authentication": "predefinedCredentialType",
+        "nodeCredentialType": "googleOAuth2Api",
+        "sendQuery": true,
+        "queryParameters": {
+          "parameters": [
+            {
+              "name": "part",
+              "value": "snippet"
+            }
+          ]
+        },
+        "sendBody": true,
+        "contentType": "json",
+        "specifyBody": "json",
+        "jsonBody": "={{ { snippet: { playlistId: $json.youtube_playlist_id_pl, resourceId: { kind: 'youtube#video', videoId: $('Resolve PL Album Playlist1').first().json.videoId } } } }}",
+        "options": {}
+      }
+    },
+    {
+      "id": "57dab852-b0ad-49b6-a189-9f9f0be9b504",
+      "name": "Add to English Playlist1",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        34208,
+        5512
+      ],
+      "credentials": {
+        "googleOAuth2Api": {
+          "id": "Gth4fs6DIqCfOkJi",
+          "name": "HusariaBeats Google"
+        }
+      },
+      "parameters": {
+        "method": "POST",
+        "url": "https://www.googleapis.com/youtube/v3/playlistItems",
+        "authentication": "predefinedCredentialType",
+        "nodeCredentialType": "googleOAuth2Api",
+        "sendQuery": true,
+        "queryParameters": {
+          "parameters": [
+            {
+              "name": "part",
+              "value": "snippet"
+            }
+          ]
+        },
+        "sendBody": true,
+        "contentType": "json",
+        "specifyBody": "json",
+        "jsonBody": "={{ { snippet: { playlistId: 'PLR97NEdUHE6jvYmYnz5tdmK8cGnaJu3n1', resourceId: { kind: 'youtube#video', videoId: $json.id } } } }}",
+        "options": {}
+      }
+    },
+    {
+      "id": "eaec0f6d-4378-4a77-a2cd-1b92d6a30180",
+      "name": "Resolve EN Album Playlist1",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        34208,
+        5712
+      ],
+      "parameters": {
+        "jsCode": "// Fetch album playlist IDs from husariabeats DB API\nconst albumNameEn = $('Parse meta.json1').first().json.albumNameEn;\nconst song = $('Parse meta.json1').first().json.song;\nconst albumSlug = song.album_slug;\nif (!albumSlug || !albumNameEn) return [];\n\nreturn [{ json: {\n  albumSlug,\n  albumNameEn,\n  videoId: $input.first().json.id\n} }];"
+      }
+    },
+    {
+      "id": "51126f1c-0ff8-4452-9569-1a1f432356d4",
+      "name": "IF Create EN Playlist1",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2,
+      "position": [
+        34208,
+        5912
+      ],
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "loose"
+          },
+          "conditions": [
+            {
+              "id": "c5f69274-5c23-42f1-b173-e67fbd1f8691",
+              "leftValue": "={{ $json.youtube_playlist_id_en }}",
+              "rightValue": "",
+              "operator": {
+                "type": "string",
+                "operation": "empty",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "and"
+        }
+      }
+    },
+    {
+      "id": "baefa6e0-dcc5-4b97-bf7e-632964d44d49",
+      "name": "Create Album EN Playlist1",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        34008,
+        6112
+      ],
+      "credentials": {
+        "googleOAuth2Api": {
+          "id": "Gth4fs6DIqCfOkJi",
+          "name": "HusariaBeats Google"
+        }
+      },
+      "parameters": {
+        "method": "POST",
+        "url": "https://www.googleapis.com/youtube/v3/playlists",
+        "authentication": "predefinedCredentialType",
+        "nodeCredentialType": "googleOAuth2Api",
+        "sendQuery": true,
+        "queryParameters": {
+          "parameters": [
+            {
+              "name": "part",
+              "value": "snippet,status"
+            }
+          ]
+        },
+        "sendBody": true,
+        "contentType": "json",
+        "specifyBody": "json",
+        "jsonBody": "={{ { snippet: { title: $('Resolve EN Album Playlist1').first().json.albumNameEn, defaultLanguage: 'en' }, status: { privacyStatus: 'public' } } }}",
+        "options": {}
+      },
+      "notes": "Creates new YouTube album playlist (EN). Runs only when playlist doesn't exist yet."
+    },
+    {
+      "id": "cdc39934-9d36-405a-beb1-755030ab6303",
+      "name": "Save EN Playlist ID1",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        34008,
+        6312
+      ],
+      "parameters": {
+        "method": "PATCH",
+        "url": "={{ 'https://husariabeats.com/api/albums/' + $('Resolve EN Album Playlist1').first().json.albumSlug }}",
+        "sendBody": true,
+        "contentType": "json",
+        "specifyBody": "json",
+        "jsonBody": "={{ { youtube_playlist_id_en: $json.id } }}",
+        "options": {}
+      }
+    },
+    {
+      "id": "a76357cc-9ad4-419c-94bc-52805ad28105",
+      "name": "Add to New Album EN Playlist1",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        34008,
+        6512
+      ],
+      "credentials": {
+        "googleOAuth2Api": {
+          "id": "Gth4fs6DIqCfOkJi",
+          "name": "HusariaBeats Google"
+        }
+      },
+      "parameters": {
+        "method": "POST",
+        "url": "https://www.googleapis.com/youtube/v3/playlistItems",
+        "authentication": "predefinedCredentialType",
+        "nodeCredentialType": "googleOAuth2Api",
+        "sendQuery": true,
+        "queryParameters": {
+          "parameters": [
+            {
+              "name": "part",
+              "value": "snippet"
+            }
+          ]
+        },
+        "sendBody": true,
+        "contentType": "json",
+        "specifyBody": "json",
+        "jsonBody": "={{ { snippet: { playlistId: $json.youtube_playlist_id_en, resourceId: { kind: 'youtube#video', videoId: $('Resolve EN Album Playlist1').first().json.videoId } } } }}",
+        "options": {}
+      }
+    },
+    {
+      "id": "e173bfa1-a474-420d-990f-d0e1b0709b3c",
+      "name": "Add to Existing Album EN Playlist1",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        34608,
+        6112
+      ],
+      "credentials": {
+        "googleOAuth2Api": {
+          "id": "Gth4fs6DIqCfOkJi",
+          "name": "HusariaBeats Google"
+        }
+      },
+      "parameters": {
+        "method": "POST",
+        "url": "https://www.googleapis.com/youtube/v3/playlistItems",
+        "authentication": "predefinedCredentialType",
+        "nodeCredentialType": "googleOAuth2Api",
+        "sendQuery": true,
+        "queryParameters": {
+          "parameters": [
+            {
+              "name": "part",
+              "value": "snippet"
+            }
+          ]
+        },
+        "sendBody": true,
+        "contentType": "json",
+        "specifyBody": "json",
+        "jsonBody": "={{ { snippet: { playlistId: $json.youtube_playlist_id_en, resourceId: { kind: 'youtube#video', videoId: $('Resolve EN Album Playlist1').first().json.videoId } } } }}",
+        "options": {}
+      }
+    },
+    {
+      "id": "e877d4e1-6ca3-440d-8e8a-beef5921dc3d",
+      "name": "Get Album PL1",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        33200,
+        5812
+      ],
+      "parameters": {
+        "method": "GET",
+        "url": "={{ 'https://husariabeats.com/api/albums/' + $json.albumSlug }}",
+        "options": {}
+      },
+      "notes": "GET /api/albums/{slug} — returns album with youtube_playlist_id_pl/en"
+    },
+    {
+      "id": "ad811432-357b-416b-b47a-7ae4b84ed49a",
+      "name": "Get Album EN1",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        34208,
+        5812
+      ],
+      "parameters": {
+        "method": "GET",
+        "url": "={{ 'https://husariabeats.com/api/albums/' + $json.albumSlug }}",
+        "options": {}
+      },
+      "notes": "GET /api/albums/{slug} — returns album with youtube_playlist_id_pl/en"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://husariabeats.com/api/revalidate",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={{ JSON.stringify({ secret: 'REDACTED', paths: ['/pl', '/en', '/pl/albums/' + $('TikTok Post (STUB)1').first().json.song.album_slug, '/en/albums/' + $('TikTok Post (STUB)1').first().json.song.album_slug] }) }}",
+        "options": {}
+      },
+      "id": "revalidate-site-husariabeats-001",
+      "name": "Revalidate Site1",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        35516,
+        5312
+      ],
+      "notes": "Flushes Next.js ISR cache for updated pages — husariabeats.com shows new song immediately."
+    }
+  ],
+  "connections": {
+    "Patch YT PL Metadata1": {
+      "main": [
+        [
+          {
+            "node": "Save YouTube ID1",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Add to Polska Playlist1",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Resolve PL Album Playlist1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Patch YT EN Metadata1": {
+      "main": [
+        [
+          {
+            "node": "Save YouTube ID EN1",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Add to English Playlist1",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Resolve EN Album Playlist1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Mark Queue Released1": {
+      "main": [
+        [
+          {
+            "node": "Mark Song Released1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "TikTok Post (STUB)1": {
+      "main": [
+        [
+          {
+            "node": "Mark Queue Released1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Instagram Post (STUB)1": {
+      "main": [
+        [
+          {
+            "node": "TikTok Post (STUB)1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Facebook Post (STUB)1": {
+      "main": [
+        [
+          {
+            "node": "Instagram Post (STUB)1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Save YouTube ID EN1": {
+      "main": [
+        [
+          {
+            "node": "Facebook Post (STUB)1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Upload EN to YouTube1": {
+      "main": [
+        [
+          {
+            "node": "Patch YT EN Metadata1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Download EN Video from Drive1": {
+      "main": [
+        [
+          {
+            "node": "Upload EN to YouTube1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Extract EN Video File ID1": {
+      "main": [
+        [
+          {
+            "node": "Download EN Video from Drive1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Find video_en.mp": {
+      "main": [
+        [
+          {
+            "node": "Extract EN Video File ID1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Save YouTube ID1": {
+      "main": [
+        [
+          {
+            "node": "Find video_en.mp",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Upload to YouTube1": {
+      "main": [
+        [
+          {
+            "node": "Patch YT PL Metadata1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Download Video from Drive1": {
+      "main": [
+        [
+          {
+            "node": "Upload to YouTube1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Parse meta.json1": {
+      "main": [
+        [
+          {
+            "node": "Download Video from Drive1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Download meta.json1": {
+      "main": [
+        [
+          {
+            "node": "Parse meta.json1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Extract meta.json ID1": {
+      "main": [
+        [
+          {
+            "node": "Download meta.json1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Find meta.json1": {
+      "main": [
+        [
+          {
+            "node": "Extract meta.json ID1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Extract Video File ID1": {
+      "main": [
+        [
+          {
+            "node": "Find meta.json1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Find video_pl.mp": {
+      "main": [
+        [
+          {
+            "node": "Extract Video File ID1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Extract Folder ID1": {
+      "main": [
+        [
+          {
+            "node": "Find video_pl.mp",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Find Release Folder1": {
+      "main": [
+        [
+          {
+            "node": "Extract Folder ID1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Extract Song Details1": {
+      "main": [
+        [
+          {
+            "node": "Find Release Folder1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get Songs List1": {
+      "main": [
+        [
+          {
+            "node": "Extract Song Details1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Mark Releasing1": {
+      "main": [
+        [
+          {
+            "node": "Get Songs List1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Restore Queue Item1": {
+      "main": [
+        [
+          {
+            "node": "Mark Releasing1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Kill Switch On?1": {
+      "main": [
+        [
+          {
+            "node": "Restore Queue Item1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get Settings1": {
+      "main": [
+        [
+          {
+            "node": "Kill Switch On?1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Has Today's Release?1": {
+      "main": [
+        [
+          {
+            "node": "Get Settings1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Find Today's Release1": {
+      "main": [
+        [
+          {
+            "node": "Has Today's Release?1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get Release Queue1": {
+      "main": [
+        [
+          {
+            "node": "Find Today's Release1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Daily 09:00 Warsaw1": {
+      "main": [
+        [
+          {
+            "node": "Get Release Queue1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Resolve PL Album Playlist1": {
+      "main": [
+        [
+          {
+            "node": "Get Album PL1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "IF Create PL Playlist1": {
+      "main": [
+        [
+          {
+            "node": "Create Album PL Playlist1",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Add to Existing Album PL Playlist1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Create Album PL Playlist1": {
+      "main": [
+        [
+          {
+            "node": "Save PL Playlist ID1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Save PL Playlist ID1": {
+      "main": [
+        [
+          {
+            "node": "Add to New Album PL Playlist1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Resolve EN Album Playlist1": {
+      "main": [
+        [
+          {
+            "node": "Get Album EN1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "IF Create EN Playlist1": {
+      "main": [
+        [
+          {
+            "node": "Create Album EN Playlist1",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Add to Existing Album EN Playlist1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Create Album EN Playlist1": {
+      "main": [
+        [
+          {
+            "node": "Save EN Playlist ID1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Save EN Playlist ID1": {
+      "main": [
+        [
+          {
+            "node": "Add to New Album EN Playlist1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get Album PL1": {
+      "main": [
+        [
+          {
+            "node": "IF Create PL Playlist1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get Album EN1": {
+      "main": [
+        [
+          {
+            "node": "IF Create EN Playlist1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Mark Song Released1": {
+      "main": [
+        [
+          {
+            "node": "Revalidate Site1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate",
+    "callerPolicy": "workflowsFromSameOwner",
+    "availableInMCP": false
+  },
+  "staticData": {
+    "node:Daily 09:00 Warsaw": {
+      "recurrenceRules": []
+    }
+  },
+  "meta": {
+    "templateCredsSetupCompleted": true
+  },
+  "pinData": {},
+  "versionId": "ab5cf4dc-4e49-4e50-a1f4-a477403c1978",
+  "activeVersionId": null,
+  "versionCounter": 90,
+  "triggerCount": 1,
+  "tags": [
+    {
+      "updatedAt": "2026-05-03T01:33:38.715Z",
+      "createdAt": "2026-05-03T01:33:38.715Z",
+      "id": "XL2QCbIA9hUWgOHg",
+      "name": "ready-to-test"
+    },
+    {
+      "updatedAt": "2026-05-02T22:10:08.448Z",
+      "createdAt": "2026-05-02T22:10:08.448Z",
+      "id": "iFjcmXZRQ80iBjdu",
+      "name": "husariabeats"
+    }
+  ],
+  "activeVersion": null
+}

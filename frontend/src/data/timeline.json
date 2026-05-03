@@ -21,13 +21,8 @@
       "Stefan M. Kuczyński, Wielka Wojna z Zakonem 1409–1411",
       "S.C. Rowell, Lithuania Ascending"
     ],
-    "plVideoId": null,
-    "enVideoId": null,
-    "plays": null,
-    "duration": null
-  },
-  {
-    "id": "warsaw-uprising-1944",
+    "plVideoId": "X2cnEO2tgpI",
+    "enVideoId": "kV0y2OWiGeA",
     "era": "wwii",
     "year": "1944",
     "yearLabel": "1 VIII 1944",
@@ -55,7 +50,7 @@
   },
   {
     "id": "gdansk-1980",
-    "era": "coldwar",
+    "era": "cold_war",
     "year": "1980",
     "yearLabel": "31 VIII 1980",
     "albumSlug": "stocznia",

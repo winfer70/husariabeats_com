@@ -10,7 +10,6 @@
     "hue":         42,
     "coverLabel":  "Wawel cathedral, gold leaf",
     "coverImage":  null,
-    "daysUntil":   null,
     "releaseDate": null
   },
   {
@@ -47,12 +46,11 @@
     "title":       { "PL": "ZAPOMNIANI", "EN": "THE FORGOTTEN" },
     "tagline":     { "PL": "Żołnierze Wyklęci", "EN": "The Cursed Soldiers" },
     "songs":       8,
-    "era":         "coldwar",
+    "era":         "cold_war",
     "released":    false,
     "hue":         220,
     "coverLabel":  "Forest at dawn, frost",
     "coverImage":  null,
-    "daysUntil":   43,
     "releaseDate": null
   },
   {
@@ -61,12 +59,11 @@
     "title":       { "PL": "STOCZNIA", "EN": "THE SHIPYARD" },
     "tagline":     { "PL": "Solidarność 1980–1989", "EN": "Solidarność, 1980–1989" },
     "songs":       10,
-    "era":         "coldwar",
+    "era":         "cold_war",
     "released":    false,
     "hue":         195,
     "coverLabel":  "Crane silhouette, banner",
     "coverImage":  null,
-    "daysUntil":   121,
     "releaseDate": null
   },
   {
@@ -80,7 +77,6 @@
     "hue":         165,
     "coverLabel":  "Concrete, neon, dawn",
     "coverImage":  null,
-    "daysUntil":   287,
     "releaseDate": null
   }
 ]

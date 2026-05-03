@@ -1,8 +1,11 @@
 # husariabeats API — FastAPI entry point
 #
 # Mounts:
-#   /api/topics  — GET list, POST create topic
-#   /api/votes   — POST vote (Redis 24h dedup by hashed email)
+#   /api/topics        — GET list, POST create, PATCH update topic
+#   /api/votes         — POST vote (Redis 24h dedup by hashed email)
+#   /api/songs         — GET list, PATCH update song
+#   /api/release_queue — GET/POST/PATCH/DELETE release queue
+#   /api/settings      — GET all settings, PUT upsert setting
 #
 # Environment variables (from .env via docker compose):
 #   DATABASE_URL  — asyncpg connection string
@@ -17,7 +20,7 @@ import redis.asyncio as aioredis
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
-from routers import topics, votes
+from routers import topics, votes, songs, release_queue, settings, albums
 
 DATABASE_URL = os.environ["DATABASE_URL"]
 REDIS_URL    = os.environ.get("REDIS_URL", "redis://redis:6379/0")
@@ -34,9 +37,14 @@ async def lifespan(app: FastAPI):
     redis_client = await aioredis.from_url(REDIS_URL, decode_responses=True)
 
     # Inject shared resources into routers
-    topics.db     = database
-    votes.db      = database
-    votes.redis   = redis_client
+    topics.db        = database
+    topics.redis     = redis_client
+    votes.db         = database
+    votes.redis      = redis_client
+    songs.db         = database
+    release_queue.db = database
+    settings.db      = database
+    albums.db        = database
 
     yield
 
@@ -54,12 +62,16 @@ app = FastAPI(
 app.add_middleware(
     CORSMiddleware,
     allow_origins=["https://husariabeats.com", "http://localhost:3001"],
-    allow_methods=["GET", "POST"],
+    allow_methods=["GET", "POST", "PATCH", "PUT", "DELETE"],
     allow_headers=["*"],
 )
 
-app.include_router(topics.router, prefix="/api")
-app.include_router(votes.router,  prefix="/api")
+app.include_router(topics.router,        prefix="/api")
+app.include_router(votes.router,         prefix="/api")
+app.include_router(songs.router,         prefix="/api")
+app.include_router(release_queue.router, prefix="/api")
+app.include_router(settings.router,      prefix="/api")
+app.include_router(albums.router,        prefix="/api")
 
 
 @app.get("/api/health")

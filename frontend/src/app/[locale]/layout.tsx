@@ -75,6 +75,16 @@ export default async function LocaleLayout({
   // Load i18n messages server-side (next-intl)
   const messages = await getMessages();
 
+  // Fetch albums for NavBar dropdown — ISR: refreshes every 5 min
+  const apiUrl = process.env.INTERNAL_API_URL ?? "http://api:8000";
+  let albums = [];
+  try {
+    const res = await fetch(`${apiUrl}/api/albums`, { next: { revalidate: 300 } });
+    if (res.ok) albums = await res.json();
+  } catch {
+    // API unavailable at build time — NavBar renders empty dropdown; ISR populates later
+  }
+
   return (
     <html
       lang={locale}
@@ -86,8 +96,8 @@ export default async function LocaleLayout({
         <div className="vignette" aria-hidden="true" />
 
         <NextIntlClientProvider messages={messages}>
-          {/* Sticky top navigation */}
-          <NavBar locale={locale} />
+          {/* Sticky top navigation — albums passed from server fetch above */}
+          <NavBar locale={locale} albums={albums} />
 
           {/* Page content — z-index 3 via globals.css */}
           <main>{children}</main>

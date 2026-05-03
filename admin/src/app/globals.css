@@ -1,0 +1,358 @@
+/*
+ * admin/src/app/globals.css
+ *
+ * Global stylesheet for the HusariaBeats admin panel.
+ * Defines the dark theme, base resets, sidebar layout, table styles,
+ * badge colours, and card styles used across all pages.
+ * No external CSS framework is used — all styles are hand-authored here.
+ */
+
+/* ── Reset & base ────────────────────────────────────────────────── */
+*, *::before, *::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+html, body {
+  height: 100%;
+}
+
+body {
+  background-color: #0a0608;
+  color: #f5f5f0;
+  font-family: 'Inter', system-ui, -apple-system, sans-serif;
+  font-size: 15px;
+  line-height: 1.6;
+  -webkit-font-smoothing: antialiased;
+}
+
+a {
+  color: inherit;
+  text-decoration: none;
+}
+
+/* ── Layout shell ────────────────────────────────────────────────── */
+.admin-layout {
+  display: flex;
+  min-height: 100vh;
+}
+
+/* ── Sidebar ─────────────────────────────────────────────────────── */
+.sidebar {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 220px;
+  height: 100vh;
+  background-color: #0d0a0b;
+  border-right: 1px solid #2e2125;
+  display: flex;
+  flex-direction: column;
+  padding: 0;
+  z-index: 100;
+  overflow-y: auto;
+}
+
+.sidebar-logo {
+  padding: 28px 24px 20px;
+  border-bottom: 1px solid #2e2125;
+}
+
+.sidebar-logo .logo-title {
+  font-size: 13px;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: #dc143c;
+}
+
+.sidebar-logo .logo-sub {
+  font-size: 11px;
+  color: #a89a92;
+  margin-top: 2px;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+
+.sidebar-nav {
+  padding: 16px 0;
+  flex: 1;
+}
+
+.sidebar-nav-label {
+  font-size: 10px;
+  font-weight: 600;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: #a89a92;
+  padding: 8px 24px 4px;
+}
+
+.sidebar-link {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 10px 24px;
+  font-size: 14px;
+  color: #c0b4ac;
+  transition: background 0.15s, color 0.15s;
+  border-left: 3px solid transparent;
+}
+
+.sidebar-link:hover {
+  background-color: #161013;
+  color: #f5f5f0;
+}
+
+.sidebar-link.active {
+  background-color: #1a0f12;
+  color: #f5f5f0;
+  border-left-color: #dc143c;
+  font-weight: 600;
+}
+
+/* ── Main content area ───────────────────────────────────────────── */
+.main-content {
+  margin-left: 220px;
+  padding: 40px;
+  flex: 1;
+  min-height: 100vh;
+}
+
+/* ── Page header ─────────────────────────────────────────────────── */
+.page-title {
+  font-size: 24px;
+  font-weight: 700;
+  margin-bottom: 8px;
+  color: #f5f5f0;
+}
+
+.page-note {
+  font-size: 13px;
+  color: #a89a92;
+  margin-bottom: 28px;
+  padding: 10px 14px;
+  background: #161013;
+  border: 1px solid #2e2125;
+  border-radius: 6px;
+  display: inline-block;
+}
+
+/* ── Card ────────────────────────────────────────────────────────── */
+.card {
+  background-color: #161013;
+  border: 1px solid #2e2125;
+  border-radius: 8px;
+  padding: 24px;
+  margin-bottom: 24px;
+}
+
+/* ── Error state ─────────────────────────────────────────────────── */
+.error-box {
+  background-color: #200a0d;
+  border: 1px solid #5c1a22;
+  border-radius: 8px;
+  padding: 20px 24px;
+  color: #f0a0a8;
+  font-size: 14px;
+  margin-top: 20px;
+}
+
+.error-box strong {
+  color: #dc143c;
+  display: block;
+  margin-bottom: 6px;
+}
+
+/* ── Tables ──────────────────────────────────────────────────────── */
+.data-table-wrapper {
+  overflow-x: auto;
+  border-radius: 8px;
+  border: 1px solid #2e2125;
+}
+
+.data-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 14px;
+}
+
+.data-table thead {
+  background-color: #120e0f;
+}
+
+.data-table th {
+  padding: 12px 16px;
+  text-align: left;
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: #a89a92;
+  border-bottom: 1px solid #2e2125;
+}
+
+.data-table td {
+  padding: 12px 16px;
+  border-bottom: 1px solid #1e1618;
+  color: #ddd4cc;
+}
+
+.data-table tbody tr:last-child td {
+  border-bottom: none;
+}
+
+.data-table tbody tr:nth-child(odd) {
+  background-color: #161013;
+}
+
+.data-table tbody tr:nth-child(even) {
+  background-color: #130d10;
+}
+
+.data-table tbody tr:hover {
+  background-color: #1e1418;
+}
+
+/* ── Status badges ───────────────────────────────────────────────── */
+.badge {
+  display: inline-block;
+  padding: 3px 9px;
+  border-radius: 12px;
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+
+.badge-gray    { background: #2a2528; color: #a89a92; }
+.badge-blue    { background: #0d1e35; color: #6aadee; }
+.badge-yellow  { background: #2a2010; color: #e0b84a; }
+.badge-orange  { background: #2e1708; color: #e87d3a; }
+.badge-purple  { background: #1e1030; color: #a87de8; }
+.badge-green   { background: #0d2018; color: #4acea8; }
+.badge-red     { background: #2e0a10; color: #e84a6a; }
+
+/* ── Settings rows ───────────────────────────────────────────────── */
+.settings-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 16px 0;
+  border-bottom: 1px solid #2e2125;
+}
+
+.settings-row:last-child {
+  border-bottom: none;
+}
+
+.settings-key {
+  font-size: 13px;
+  font-weight: 600;
+  color: #f5f5f0;
+  font-family: 'Courier New', monospace;
+}
+
+.settings-value {
+  font-size: 13px;
+  color: #a89a92;
+  max-width: 60%;
+  text-align: right;
+  word-break: break-all;
+}
+
+/* ── Toggle (kill switch) ────────────────────────────────────────── */
+.toggle-wrapper {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.toggle-label {
+  font-size: 12px;
+  color: #a89a92;
+}
+
+.toggle-indicator {
+  display: inline-block;
+  width: 36px;
+  height: 20px;
+  border-radius: 10px;
+  position: relative;
+  cursor: pointer;
+  opacity: 0.8;
+}
+
+.toggle-indicator.on  { background: #dc143c; }
+.toggle-indicator.off { background: #3a2a30; }
+
+.toggle-indicator::after {
+  content: '';
+  position: absolute;
+  top: 3px;
+  width: 14px;
+  height: 14px;
+  border-radius: 50%;
+  background: #f5f5f0;
+  transition: left 0.2s;
+}
+
+.toggle-indicator.on::after  { left: 19px; }
+.toggle-indicator.off::after { left: 3px; }
+
+/* ── Buttons ─────────────────────────────────────────────────────── */
+.btn-primary {
+  background-color: #dc143c;
+  color: #f5f5f0;
+  border: none;
+  border-radius: 5px;
+  padding: 8px 18px;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.15s, opacity 0.15s;
+}
+
+.btn-primary:hover:not(:disabled) { background-color: #b01030; }
+.btn-primary:disabled              { opacity: 0.4; cursor: not-allowed; }
+
+.btn-secondary {
+  background-color: transparent;
+  color: #a89a92;
+  border: 1px solid #3a3028;
+  border-radius: 5px;
+  padding: 8px 18px;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: border-color 0.15s, color 0.15s;
+}
+
+.btn-secondary:hover:not(:disabled) { border-color: #a89a92; color: #f5f5f0; }
+.btn-secondary:disabled              { opacity: 0.4; cursor: not-allowed; }
+
+.btn-danger {
+  background-color: transparent;
+  color: #e84a6a;
+  border: 1px solid #5c1a22;
+  border-radius: 5px;
+  padding: 4px 12px;
+  font-size: 12px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.15s;
+}
+
+.btn-danger:hover:not(:disabled) { background-color: #2e0a10; }
+.btn-danger:disabled              { opacity: 0.4; cursor: not-allowed; }
+
+/* ── Success state ───────────────────────────────────────────────── */
+.success-box {
+  background-color: #0d2018;
+  border: 1px solid #1a5c3a;
+  border-radius: 8px;
+  padding: 12px 18px;
+  color: #4acea8;
+  font-size: 14px;
+}

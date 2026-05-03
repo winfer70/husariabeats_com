@@ -3,7 +3,7 @@
  *
  * Features:
  *   - Scroll-aware backdrop blur (intensifies after 8px scroll)
- *   - Albums hover dropdown with all album titles
+ *   - Albums hover dropdown with all album titles (receives albums as prop)
  *   - PL/EN language toggle with flag SVGs
  *   - Active page indicator (crimson underline)
  *   - Uses next/link for client-side navigation
@@ -17,19 +17,29 @@ import { useTranslations } from "next-intl";
 import { useEffect, useRef, useState } from "react";
 
 import { Logo, FlagPL, FlagGB } from "@/components/Logo";
-import albums from "@/data/albums.json";
+
+/** Minimal album shape needed for the nav dropdown. */
+interface NavAlbum {
+  slug:      string;
+  title_pl:  string | null;
+  title_en:  string | null;
+  status:    string;
+}
 
 interface NavBarProps {
   /** Current locale from [locale] segment ("pl" | "en") */
   locale: string;
+  /** Albums list fetched server-side by layout.tsx */
+  albums: NavAlbum[];
 }
 
 /**
  * Sticky top navbar with scroll-blur, albums dropdown, and language toggle.
  *
  * @param locale - active locale string
+ * @param albums - album list passed from layout server component
  */
-export default function NavBar({ locale }: NavBarProps) {
+export default function NavBar({ locale, albums }: NavBarProps) {
   const t        = useTranslations("nav");
   const pathname = usePathname();
 
@@ -157,7 +167,7 @@ export default function NavBar({ locale }: NavBarProps) {
                     >
                       {albums.map((album) => (
                         <Link
-                          key={album.id}
+                          key={album.slug}
                           href={`/${locale}/albums/${album.slug}`}
                           onClick={() => setAlbumsOpen(false)}
                           style={{
@@ -171,9 +181,9 @@ export default function NavBar({ locale }: NavBarProps) {
                           }}
                         >
                           <span style={{ fontFamily: "var(--serif)", fontSize: 15, fontWeight: 600, letterSpacing: "0.04em" }}>
-                            {locale === "pl" ? album.title.PL : album.title.EN}
+                            {locale === "pl" ? album.title_pl : album.title_en}
                           </span>
-                          {!album.released && (
+                          {album.status !== "released" && (
                             <span style={{ fontFamily: "var(--mono)", fontSize: 9, color: "var(--gold)", letterSpacing: "0.1em" }}>
                               SOON
                             </span>

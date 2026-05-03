@@ -23,8 +23,9 @@ DNS       : Cloudflare proxied A record → server IP
 
 PORTS (host-bound, localhost only)
 -----------------------------------
-Next.js frontend  : 127.0.0.1:3001   (ticker-tap uses :3000 if applicable)
+Next.js frontend  : 127.0.0.1:3001   (avoids clashes)
 FastAPI backend   : 127.0.0.1:8001   (ticker-tap uses :8000 — no clash)
+Admin panel       : 127.0.0.1:3002   (internal only, Cloudflare Access protected)
 PostgreSQL        : internal Docker network only (no host port)
 Redis             : internal Docker network only (no host port)
 
@@ -66,6 +67,14 @@ PROJECT FOLDER ON SERVER
 │       ├── topics.py           # GET /api/topics, POST /api/topics
 │       └── votes.py            # POST /api/votes — Redis 24hr dedup by hashed email
 │
+├── admin/
+│   ├── Dockerfile              # separate internal-only panel
+│   └── src/
+│       └── app/
+│           ├── queue/page.tsx  # release queue drag/drop, set dates, cadence
+│           ├── songs/page.tsx  # update song status, upload cover art
+│           └── voting/page.tsx # view topics, assign to album
+│
 └── db/
     └── init.sql                # schema bootstrap (runs on first container start)
 
@@ -96,6 +105,15 @@ services:
       redis:
         condition: service_started
 
+  admin:
+    build: ./admin
+    restart: unless-stopped
+    ports:
+      - "127.0.0.1:3002:3000"
+    env_file: .env
+    depends_on:
+      - db
+
   db:
     image: postgres:16-alpine
     restart: unless-stopped
@@ -125,18 +143,69 @@ volumes:
 
 DATABASE SCHEMA (db/init.sql)
 ------------------------------
+-- Song status tracking
+CREATE TABLE songs (
+  slug        VARCHAR(100) PRIMARY KEY,
+  title_pl    VARCHAR(200),
+  title_en    VARCHAR(200),
+  status      VARCHAR(50) DEFAULT 'scaffold',
+              -- scaffold|audio_ready|sync_done|render_done|scheduled|released
+  album_slug  VARCHAR(100),
+  year_event  INTEGER,
+  era         VARCHAR(50),
+              -- medieval|partitions|wwi|wwii|cold_war|modern
+  youtube_id_pl  VARCHAR(20),
+  youtube_id_en  VARCHAR(20),
+  image_path  TEXT,
+  release_date TIMESTAMPTZ,
+  created_at  TIMESTAMPTZ DEFAULT NOW()
+);
+
+-- Album tracking
+CREATE TABLE albums (
+  slug         VARCHAR(100) PRIMARY KEY,
+  title        VARCHAR(200),
+  description  TEXT,
+  status       VARCHAR(50) DEFAULT 'planned',
+               -- planned|in_production|released
+  release_date TIMESTAMPTZ,
+  cover_art    TEXT
+);
+
+-- Release queue (for automated publishing)
+CREATE TABLE release_queue (
+  id            SERIAL PRIMARY KEY,
+  song_id       VARCHAR(100) REFERENCES songs(slug),
+  scheduled_at  TIMESTAMPTZ NOT NULL,
+  status        VARCHAR(50) DEFAULT 'queued',   -- queued|released|skipped
+  platforms     TEXT[] DEFAULT '{youtube,facebook,instagram,tiktok}',
+  created_at    TIMESTAMPTZ DEFAULT NOW()
+);
+
+-- Configurable settings (change without redeploying)
+CREATE TABLE settings (
+  key   VARCHAR(100) PRIMARY KEY,
+  value TEXT
+);
+INSERT INTO settings VALUES
+  ('release_min_gap_hours', '24'),   -- min hours between auto-releases
+  ('release_daily_limit',   '1'),    -- max songs released per day
+  ('auto_release_enabled',  'true'); -- global kill switch
+
+-- Community voting
 CREATE TABLE topics (
   id          SERIAL PRIMARY KEY,
   title       VARCHAR(200) NOT NULL,
   description TEXT,
-  status      VARCHAR(50) DEFAULT 'open',   -- open | in_development | released
+  status      VARCHAR(50) DEFAULT 'open',  -- open|in_development|released
+  planned_release VARCHAR(50),             -- e.g. "Jun 2026"
   created_at  TIMESTAMPTZ DEFAULT NOW()
 );
 
 CREATE TABLE votes (
   id          SERIAL PRIMARY KEY,
   topic_id    INTEGER REFERENCES topics(id),
-  email_hash  VARCHAR(64) NOT NULL,          -- SHA-256 of email, never store raw
+  email_hash  VARCHAR(64) NOT NULL,         -- SHA-256, never store raw email
   voted_at    TIMESTAMPTZ DEFAULT NOW()
 );
 
@@ -144,8 +213,67 @@ CREATE INDEX idx_votes_topic ON votes(topic_id);
 CREATE INDEX idx_votes_email_hash ON votes(email_hash);
 
 
-NGINX CONFIG — /etc/nginx/sites-available/husariabeats.com.conf
-----------------------------------------------------------------
+RELEASE AUTOMATION ARCHITECTURE
+---------------------------------
+Single source of truth: PostgreSQL DB (songs table + release_queue)
+Admin panel manages the queue and settings.
+n8n (existing at REDACTEDn8n.win) executes the release chain.
+
+RELEASE CHAIN (triggered by n8n daily cron 09:00):
+  1. Check release_queue for today's scheduled items
+  2. Check settings: auto_release_enabled=true, within daily_limit
+  3. Upload MP4 → YouTube (via YouTube Data API v3, OAuth stored in n8n)
+  4. Set YouTube publish time, add to playlist
+  5. On YouTube publish → post to Facebook Page (Graph API)
+  6. On YouTube publish → post to Instagram Business (Graph API)
+  7. On YouTube publish → post to TikTok (Content Posting API)
+  8. Update songs.status → 'released' in DB
+  9. Update release_queue.status → 'released'
+  10. If voting topic exists for this song → close it, add planned_release badge
+  11. Website timeline auto-reflects new status (reads DB, no manual update)
+
+SEMI-AUTOMATED LOCAL SCRIPT:
+  python scripts/release.py --song kosacki --date 2026-05-15
+  → Updates DB song status + release date
+  → Adds entry to release_queue
+  → Generates YouTube title/description from template (PL+EN)
+  → Prepares DistroKid CSV row
+  → Drafts social post text to file
+  → Closes voting topic
+
+DISTROKIT: no API — script prepares CSV, human submits (~1 day before release date)
+
+ALBUM RELEASE CADENCE:
+  Admin sets: start date + gap (hours) in settings table
+  Queue auto-fills from that date forward
+  Change release_min_gap_hours → cadence changes immediately, no redeploy
+  Kill switch: set auto_release_enabled=false to pause everything
+
+
+ADMIN PANEL — CLOUDFLARE ACCESS (internal only)
+------------------------------------------------
+URL: admin.husariabeats.com (or husariabeats-admin.com — TBD)
+Protection: Cloudflare Zero Trust → Access → Self-hosted application
+            Policy: Allow → Email → husariabeats@gmail.com
+            Nobody else can reach URL even if they know it
+            Login: Cloudflare emails one-time code (no password to manage)
+
+nginx config for admin:
+  proxy_pass http://127.0.0.1:3002
+  (Cloudflare Access validates before any request reaches nginx)
+
+Admin panel functions:
+  - Release queue: drag/drop song order, set start date, set gap hours
+  - Song management: update status, upload cover art, edit metadata
+  - Voting dashboard: view top topics, assign to album, set planned_release
+  - Settings: change release_daily_limit, release_min_gap_hours, kill switch
+
+
+NGINX CONFIGS
+-------------
+
+/etc/nginx/sites-available/husariabeats.com.conf
+------------------------------------------------
 # HTTP → HTTPS redirect
 server {
     listen 80;
@@ -174,7 +302,7 @@ server {
     add_header Strict-Transport-Security "max-age=31536000; includeSubDomains; preload" always;
     add_header X-Content-Type-Options "nosniff" always;
     add_header Referrer-Policy "strict-origin-when-cross-origin" always;
-    # NOTE: X-Frame-Options DENY is intentionally omitted — YouTube embeds need it
+    # NOTE: X-Frame-Options DENY intentionally omitted — YouTube embeds need frames
 
     client_max_body_size 5m;
 
@@ -201,6 +329,31 @@ server {
     }
 }
 
+/etc/nginx/sites-available/husariabeats-admin.conf  (admin panel)
+------------------------------------------------------------------
+server {
+    listen 80;
+    listen [::]:80;
+    server_name admin.husariabeats.com;
+    location / { return 301 https://$host$request_uri; }
+}
+server {
+    listen 443 ssl http2;
+    listen [::]:443 ssl http2;
+    server_name admin.husariabeats.com;
+
+    ssl_certificate     /etc/letsencrypt/live/husariabeats.com/fullchain.pem;
+    ssl_certificate_key /etc/letsencrypt/live/husariabeats.com/privkey.pem;
+    ssl_protocols       TLSv1.2 TLSv1.3;
+
+    location / {
+        proxy_pass http://127.0.0.1:3002;
+        proxy_set_header Host              $host;
+        proxy_set_header X-Real-IP         $remote_addr;
+        proxy_set_header X-Forwarded-Proto $scheme;
+    }
+}
+
 
 DEPLOYMENT STEPS (run once on server)
 --------------------------------------
@@ -208,19 +361,24 @@ DEPLOYMENT STEPS (run once on server)
 mkdir -p ~/docker/husariabeats
 cd ~/docker/husariabeats
 
-# 2. Add Cloudflare DNS A record: husariabeats.com → server IP (orange cloud)
-#    Set SSL/TLS mode to Full (strict)
+# 2. Cloudflare DNS:
+#    A record: husariabeats.com → server IP (orange cloud)
+#    A record: admin.husariabeats.com → server IP (orange cloud)
+#    SSL/TLS mode: Full (strict)
+#    Zero Trust → Access → add application for admin.husariabeats.com
+#                         policy: Allow email = husariabeats@gmail.com
 
-# 3. Get TLS cert (nginx must be running, port 80 open)
-sudo certbot --nginx -d husariabeats.com -d www.husariabeats.com
+# 3. Get TLS cert (covers both subdomains)
+sudo certbot --nginx -d husariabeats.com -d www.husariabeats.com -d admin.husariabeats.com
 
-# 4. Enable nginx config
+# 4. Enable nginx configs
 sudo ln -s /etc/nginx/sites-available/husariabeats.com.conf /etc/nginx/sites-enabled/
+sudo ln -s /etc/nginx/sites-available/husariabeats-admin.conf /etc/nginx/sites-enabled/
 sudo nginx -t && sudo nginx -s reload
 
 # 5. Create .env from example
 cp .env.example .env
-# Fill in: POSTGRES_USER, POSTGRES_PASSWORD, REDIS_URL, SECRET_KEY
+# Fill in: POSTGRES_USER, POSTGRES_PASSWORD, SECRET_KEY, RESEND_API_KEY
 
 # 6. Start all containers
 docker compose up -d
@@ -228,6 +386,7 @@ docker compose up -d
 # 7. Verify
 docker compose ps
 curl -I https://husariabeats.com
+curl -I https://admin.husariabeats.com  # should require Cloudflare login
 
 
 .env.example
@@ -238,28 +397,110 @@ POSTGRES_DB=husariabeats
 REDIS_URL=redis://redis:6379/0
 SECRET_KEY=changeme_random_64char_string
 NEXT_PUBLIC_API_URL=https://husariabeats.com/api
+RESEND_API_KEY=re_xxxxxxxxxxxx
+
+
+ONE-TIME EXTERNAL SETUP (not server work)
+------------------------------------------
+1. GOOGLE CLOUD — YouTube Data API:
+   - console.cloud.google.com → New project: HusariaBeats
+   - Enable YouTube Data API v3
+   - Create OAuth 2.0 credential → Web Application
+   - Redirect URI: https://REDACTEDn8n.win/rest/oauth2-credential/callback
+   - Copy Client ID + Secret → add to n8n Google credential
+   - Authorize once in n8n → refresh token stored automatically
+   - No billing needed, free quota (10,000 units/day) is sufficient
+
+2. META (Facebook + Instagram):
+   - developers.facebook.com → New App → Business
+   - Add permissions: pages_manage_posts, instagram_content_publish
+   - Instagram Business account must be linked to Facebook Page
+   - App Review required before going live (1-2 week process)
+   - Add credentials to n8n Facebook Graph API credential
+
+3. TIKTOK:
+   - developers.tiktok.com → Create app
+   - Request scope: video.publish
+   - Submit for TikTok audit (required for public posts — can take weeks)
+   - Start this process EARLY — apply before ZAPOMNIANI release (Jun 2026)
+   - Add credentials to n8n TikTok credential
+
+4. RESEND (email for voting magic links):
+   - resend.com → Create account → Get API key
+   - Verify domain: husariabeats.com (add DNS TXT record in Cloudflare)
+   - Free tier: 3,000 emails/month — sufficient
+   - Add RESEND_API_KEY to .env
+
+5. CLOUDFLARE ZERO TRUST:
+   - dash.cloudflare.com → Zero Trust → Access → Applications
+   - Add Self-hosted app → domain: admin.husariabeats.com
+   - Policy: Allow, Email = husariabeats@gmail.com
+   - Free tier: 50 users — sufficient
+
+
+COST SUMMARY (monthly, all confirmed free tiers)
+--------------------------------------------------
+Service                  | Free Tier              | Est. Monthly Cost
+-------------------------|------------------------|-------------------
+YouTube Data API v3      | 10,000 units/day       | $0
+Google Cloud Platform    | Always Free            | $0
+Facebook Graph API       | Free                   | $0
+Instagram Graph API      | Free                   | $0
+TikTok Content API       | Free (audit needed)    | $0
+Cloudflare Zero Trust    | 50 users free          | $0
+Resend (magic link email)| 3,000 emails/month     | $0
+n8n self-hosted          | Free (Sustainable Use) | $0
+PostgreSQL + Redis       | Self-hosted Docker     | $0
+Next.js + FastAPI        | Open source            | $0
+-------------------------|------------------------|-------------------
+TOTAL ADDITIONAL COST    |                        | $0/month
+
+Existing subscriptions unchanged:
+  Suno Pro $10/mo | DistroKid $44.99/yr | Claude Pro $20/mo
+  Leonardo AI Essential $10/mo ≈ €43/mo total
+
+IMPORTANT NOTES ON FREE TIERS:
+- YouTube quota: 1 upload ≈ 1,600–1,750 units; cap = 10,000/day → safe for 5 uploads/day
+- TikTok: unaudited app posts as PRIVATE — apply for audit BEFORE first release day
+- Meta App Review: 1-2 week process — start before ZAPOMNIANI (Jun 2026)
+- Resend: 100 emails/day cap on free tier; voting magic links will not hit this
 
 
 SWAPPABILITY NOTES
 ------------------
 Content (songs/albums) : JSON files in frontend/src/data/ → swap to Strapi/Directus
                          later without touching API or nginx
-API framework          : FastAPI on :8001 → swap to Node/Express, nginx doesn't care
-Auth (voting)          : email magic link → swap to Google OAuth in one router file
+API framework          : FastAPI on :8001 → swap to Node/Express; nginx doesn't care
+Auth (voting)          : email magic link (Resend) → swap to Google OAuth in one file
 Database               : PostgreSQL with Alembic migrations ready to add
 Frontend framework     : Next.js container on :3001 → fully swappable
+Release cadence        : change settings table values (no redeploy needed)
+Admin panel            : separate container on :3002 → fully independent
+
+
+BUILD PHASES
+------------
+Phase 1: Website (frontend + API + DB + admin scaffold)    → After design confirmed
+Phase 2: Google Cloud + YouTube API OAuth setup            → Before ZAPOMNIANI Jun 2026
+Phase 3: n8n workflows (upload → social chain)             → Before ZAPOMNIANI Jun 2026
+Phase 4: Release queue UI in admin panel                   → Before ZAPOMNIANI Jun 2026
+Phase 5: Cloudflare Access on admin panel                  → Same time as Phase 4
+
+TARGET: ZAPOMNIANI (Jun 2026) = first fully automated album release (10 songs, 10 days)
 
 
 KEY DESIGN DECISIONS
 --------------------
 - Language in URL: /pl/... and /en/... (SEO + shareable links)
-- Language drives which YouTube embed src is shown per song (PL vs EN video ID)
-- Song content stored in songs.json: { id, slug, titlePL, titleEN,
-  yearEvent, era, youtubeIdPL, youtubeIdEN, imagePath, summaryPL, summaryEN,
+- Language toggle drives YouTube embed src per song (PL vs EN video ID)
+- songs.json schema: { slug, titlePL, titleEN, yearEvent, era,
+  youtubeIdPL, youtubeIdEN, imagePath, summaryPL, summaryEN,
   sourcesPL[], sourcesEN[], albumSlug }
-- Voting: email hash stored (SHA-256), never raw email; Redis key = hash:topicId
-  with 24hr TTL; upvote only (no downvote)
-- Albums: status field — "released" | "in_production" | "planned"
+- Voting: email hash stored (SHA-256), never raw email
+  Redis key = hash:topicId with 24hr TTL; upvote only
+- Albums: status = released | in_production | planned
   Planned albums show countdown to releaseDate instead of cover art
+- DB = single source of truth for all status; website reads it live
+  No manual JSON edits needed after songs are released
 
 ================================================================

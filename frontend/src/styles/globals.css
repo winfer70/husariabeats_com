@@ -244,3 +244,9 @@ main {
     gap:                   40px;
   }
 }
+
+/* Desktop-only locale toggle — hidden on mobile (shown inside overlay instead) */
+.nav-locale-desktop { display: flex; align-items: center; }
+@media (max-width: 768px) {
+  .nav-locale-desktop { display: none !important; }
+}

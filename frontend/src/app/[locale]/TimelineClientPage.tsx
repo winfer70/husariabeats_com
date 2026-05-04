@@ -325,6 +325,7 @@ function TimelineSection({ song, L, index, expanded, onToggle, t }: TimelineSect
 
   return (
     <section
+      id={song.slug}
       ref={ref}
       className="timeline-section-pad"
       style={{

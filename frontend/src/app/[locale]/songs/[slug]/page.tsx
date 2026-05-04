@@ -183,7 +183,7 @@ export default async function SongDetailPage({ params: { locale, slug } }: Props
 
       {/* Back navigation */}
       <div style={{ display: "flex", gap: 24 }}>
-        <Link href={`/${locale}`}
+        <Link href={`/${locale}#${song.slug}`}
           style={{ fontFamily: "var(--mono)", fontSize: 11, letterSpacing: "0.3em", color: "var(--muted-2)", textDecoration: "none", textTransform: "uppercase" }}>
           ← {isPL ? "Wróć do osi czasu" : "Back to Timeline"}
         </Link>

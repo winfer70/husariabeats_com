@@ -57,7 +57,7 @@ export default async function AlbumDetailPage({ params: { locale, slug } }: Prop
   const tagline = (isPL ? album.tagline_pl : album.tagline_en) ?? "";
 
   return (
-    <div style={{ padding: "140px 36px 120px", maxWidth: 1440, margin: "0 auto" }}>
+    <div className="page-pad">
 
       {/* Breadcrumb */}
       <div style={{

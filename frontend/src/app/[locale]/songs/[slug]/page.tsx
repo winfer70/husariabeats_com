@@ -124,7 +124,7 @@ export default async function SongDetailPage({ params: { locale, slug } }: Props
       </div>
 
       {/* Two-column layout: long text + YouTube */}
-      <div style={{ display: "grid", gridTemplateColumns: ytId ? "1fr 400px" : "1fr", gap: 64, marginBottom: 72, alignItems: "start" }}>
+      <div className={`song-detail-grid ${ytId ? "song-detail-grid--with-video" : "song-detail-grid--no-video"}`}>
 
         {/* Long text */}
         {longText && (

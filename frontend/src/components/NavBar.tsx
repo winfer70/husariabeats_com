@@ -45,6 +45,7 @@ export default function NavBar({ locale, albums }: NavBarProps) {
 
   const [scrolled,    setScrolled]    = useState(false);
   const [albumsOpen,  setAlbumsOpen]  = useState(false);
+  const [menuOpen,    setMenuOpen]    = useState(false);
   const closeTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   // Track scroll position to switch navbar opacity
@@ -120,8 +121,8 @@ export default function NavBar({ locale, albums }: NavBarProps) {
           <Logo />
         </Link>
 
-        {/* Desktop nav links */}
-        <div style={{ display: "flex", alignItems: "center", gap: 36 }}>
+        {/* Desktop nav links — hidden on mobile via nav-links-desktop */}
+        <div className="nav-links-desktop" style={{ alignItems: "center", gap: 36 }}>
           {links.map((link) => {
             const active = isActive(link.href);
 
@@ -229,6 +230,123 @@ export default function NavBar({ locale, albums }: NavBarProps) {
             );
           })}
         </div>
+
+        {/* Hamburger button — visible only on mobile via nav-hamburger class */}
+        <button
+          className="nav-hamburger"
+          onClick={() => setMenuOpen(v => !v)}
+          aria-label="Menu"
+          style={{
+            background:    "none",
+            border:        "none",
+            cursor:        "pointer",
+            color:         "var(--cream)",
+            padding:        8,
+            display:       "flex",
+            flexDirection: "column",
+            gap:            5,
+          }}
+        >
+          {/* Three horizontal lines, or ✕ when open */}
+          {menuOpen ? (
+            <span style={{ fontFamily: "var(--mono)", fontSize: 20, lineHeight: 1 }}>✕</span>
+          ) : (
+            <>
+              <span style={{ display: "block", width: 22, height: 1.5, background: "var(--cream)" }} />
+              <span style={{ display: "block", width: 22, height: 1.5, background: "var(--cream)" }} />
+              <span style={{ display: "block", width: 22, height: 1.5, background: "var(--cream)" }} />
+            </>
+          )}
+        </button>
+
+        {/* Mobile full-screen overlay — rendered outside the flex row via portal-like fixed position */}
+        {menuOpen && (
+          <div
+            className="nav-mobile-overlay"
+            style={{
+              position:      "fixed",
+              inset:          0,
+              background:    "var(--bg-0)",
+              zIndex:         999,
+              display:       "flex",
+              flexDirection: "column",
+              alignItems:    "center",
+              justifyContent:"center",
+              gap:            40,
+            }}
+          >
+            {/* Close button top-right */}
+            <button
+              onClick={() => setMenuOpen(false)}
+              style={{
+                position:   "absolute",
+                top:         24,
+                right:       24,
+                background: "none",
+                border:     "none",
+                cursor:     "pointer",
+                color:      "var(--cream)",
+                fontFamily: "var(--mono)",
+                fontSize:    20,
+              }}
+            >✕</button>
+
+            {/* Nav links — large serif, stacked vertically */}
+            {links.map((link) => (
+              <Link
+                key={link.id}
+                href={link.href}
+                onClick={() => setMenuOpen(false)}
+                style={{
+                  fontFamily:    "var(--serif)",
+                  fontSize:       42,
+                  fontWeight:     600,
+                  color:         "var(--cream)",
+                  textDecoration:"none",
+                  letterSpacing: "-0.01em",
+                }}
+              >
+                {link.label}
+              </Link>
+            ))}
+
+            {/* Locale toggle — mirrors desktop toggle */}
+            <div style={{
+              display:    "flex",
+              alignItems: "center",
+              gap:         0,
+              border:     "1px solid rgba(220,20,60,0.25)",
+              borderRadius:999,
+              padding:     3,
+              background: "rgba(0,0,0,0.3)",
+              marginTop:   20,
+            }}>
+              {(["pl", "en"] as const).map((lng) => (
+                <Link
+                  key={lng}
+                  href={lng === locale ? pathname : toggleHref}
+                  onClick={() => setMenuOpen(false)}
+                  style={{
+                    display:       "flex",
+                    alignItems:    "center",
+                    gap:            7,
+                    padding:       "6px 12px",
+                    borderRadius:   999,
+                    background:     lng === locale ? "rgba(220,20,60,0.15)" : "transparent",
+                    color:          lng === locale ? "var(--cream)" : "var(--muted)",
+                    fontSize:       11,
+                    letterSpacing: "0.18em",
+                    fontWeight:     600,
+                    transition:    "background 160ms",
+                  }}
+                >
+                  {lng === "pl" ? <FlagPL /> : <FlagGB />}
+                  {lng.toUpperCase()}
+                </Link>
+              ))}
+            </div>
+          </div>
+        )}
 
         {/* PL / EN language toggle */}
         <div style={{

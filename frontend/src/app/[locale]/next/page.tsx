@@ -574,7 +574,7 @@ export default function WhatsNextPage() {
   const totalVotes = sorted.reduce((sum, t) => sum + t.vote_count, 0);
 
   return (
-    <div style={{ padding: "140px 36px 120px", maxWidth: 1440, margin: "0 auto" }}>
+    <div className="page-pad">
 
       {/* ── Subscribed / expired banner (driven by ?subscribed= URL param) ── */}
       {subscribedBanner && (
@@ -644,12 +644,7 @@ export default function WhatsNextPage() {
       </div>
 
       {/* ── Two-column grid: form (left) + topic list (right) ── */}
-      <div style={{
-        display:             "grid",
-        gridTemplateColumns: "420px 1fr",
-        gap:                 48,
-        alignItems:          "start",
-      }}>
+      <div className="voting-layout">
 
         {/* Left: sticky submission form */}
         <SubmissionForm onSubmit={handleNewTopic} onEmailChange={setVoterEmail} t={t} />

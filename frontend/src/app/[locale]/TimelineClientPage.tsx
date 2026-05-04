@@ -326,10 +326,10 @@ function TimelineSection({ song, L, index, expanded, onToggle, t }: TimelineSect
   return (
     <section
       ref={ref}
+      className="timeline-section-pad"
       style={{
         position:  "relative",
         minHeight: "100vh",
-        padding:   "140px 36px 100px",
         overflow:  "hidden",
       }}
     >
@@ -344,16 +344,13 @@ function TimelineSection({ song, L, index, expanded, onToggle, t }: TimelineSect
       </div>
 
       {/* 2-column content grid */}
-      <div style={{
-        position:            "relative",
-        zIndex:              2,
-        maxWidth:            1440,
-        margin:              "0 auto",
-        display:             "grid",
-        gridTemplateColumns: "1fr 1fr",
-        gap:                 80,
-        alignItems:          "center",
-        minHeight:           "calc(100vh - 240px)",
+      <div className="timeline-section-grid" style={{
+        position:  "relative",
+        zIndex:    2,
+        maxWidth:  1440,
+        margin:    "0 auto",
+        alignItems:"center",
+        minHeight: "calc(100vh - 240px)",
       }}>
         {flipped ? (
           <>
@@ -514,10 +511,9 @@ export default function TimelineClientPage({ songs, locale }: TimelineClientPage
     <div>
 
       {/* ── Hero ─────────────────────────────────────────────────────────── */}
-      <section style={{
+      <section className="timeline-hero-pad" style={{
         position:       "relative",
         minHeight:      "72vh",
-        padding:        "160px 36px 80px",
         display:        "flex",
         flexDirection:  "column",
         justifyContent: "flex-end",

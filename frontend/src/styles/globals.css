@@ -111,3 +111,136 @@ main {
   position: relative;
   z-index:  3;
 }
+
+/* ══════════════════════════════════════════════════════════════════════════
+   RESPONSIVE LAYOUT UTILITIES
+   Breakpoints: mobile ≤ 768px, tablet ≤ 1024px
+   ══════════════════════════════════════════════════════════════════════════ */
+
+/* Page section padding */
+.page-pad {
+  padding: 140px 36px 120px;
+  max-width: 1440px;
+  margin: 0 auto;
+}
+
+/* Footer 3-column grid */
+.footer-grid {
+  max-width: 1440px;
+  margin: 0 auto;
+  display: grid;
+  grid-template-columns: 1fr auto 1fr;
+  gap: 40px;
+  align-items: start;
+}
+
+/* Song detail 2-col (text + sticky YT) */
+.song-detail-grid {
+  display: grid;
+  gap: 64px;
+  margin-bottom: 72px;
+  align-items: start;
+}
+.song-detail-grid--with-video {
+  grid-template-columns: 1fr 400px;
+}
+.song-detail-grid--no-video {
+  grid-template-columns: 1fr;
+}
+
+/* Album grid */
+.albums-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(340px, 1fr));
+  gap: 28px;
+}
+
+/* Navigation responsive */
+.nav-links-desktop { display: flex; }
+.nav-hamburger     { display: none; }
+
+@media (max-width: 768px) {
+  .page-pad {
+    padding: 100px 20px 80px;
+  }
+
+  .footer-grid {
+    grid-template-columns: 1fr;
+    gap: 32px;
+    text-align: center;
+  }
+  .footer-grid > *:last-child {
+    text-align: center;
+    align-items: center;
+  }
+
+  .song-detail-grid--with-video,
+  .song-detail-grid--no-video {
+    grid-template-columns: 1fr;
+    gap: 40px;
+  }
+
+  .albums-grid {
+    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+    gap: 16px;
+  }
+
+  .nav-links-desktop { display: none !important; }
+  .nav-hamburger     { display: flex !important; }
+}
+
+@media (max-width: 480px) {
+  .page-pad {
+    padding: 88px 16px 64px;
+  }
+  .albums-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* What's Next — form + topic list two-column layout */
+.voting-layout {
+  display:               grid;
+  grid-template-columns: 420px 1fr;
+  gap:                   48px;
+  align-items:           start;
+}
+@media (max-width: 768px) {
+  .voting-layout {
+    grid-template-columns: 1fr;
+    gap:                   32px;
+  }
+}
+
+/* Timeline hero section padding */
+.timeline-hero-pad {
+  padding: 160px 36px 80px;
+}
+@media (max-width: 768px) {
+  .timeline-hero-pad {
+    padding: 100px 20px 60px;
+  }
+}
+
+/* Timeline section outer padding */
+.timeline-section-pad {
+  padding: 140px 36px 100px;
+}
+@media (max-width: 768px) {
+  .timeline-section-pad {
+    padding: 80px 20px 60px;
+  }
+}
+
+/* Timeline section two-column content grid */
+.timeline-section-grid {
+  display:               grid;
+  grid-template-columns: 1fr 1fr;
+  gap:                   80px;
+}
+@media (max-width: 768px) {
+  .timeline-section-grid {
+    grid-template-columns: 1fr;
+    gap:                   40px;
+  }
+}

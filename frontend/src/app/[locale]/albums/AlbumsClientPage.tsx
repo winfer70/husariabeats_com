@@ -471,7 +471,7 @@ export default function AlbumsClientPage({ albums, locale }: AlbumsClientPagePro
   const L = (locale === "pl" ? "PL" : "EN") as "PL" | "EN";
 
   return (
-    <div style={{ padding: "140px 36px 120px", maxWidth: 1440, margin: "0 auto" }}>
+    <div className="page-pad">
 
       {/* Page header */}
       <div style={{ marginBottom: 64 }}>
@@ -510,11 +510,7 @@ export default function AlbumsClientPage({ albums, locale }: AlbumsClientPagePro
       </div>
 
       {/* Album grid */}
-      <div style={{
-        display:             "grid",
-        gridTemplateColumns: "repeat(auto-fill, minmax(340px, 1fr))",
-        gap:                 28,
-      }}>
+      <div className="albums-grid">
         {albums.map((album) => (
           <AlbumCard key={album.slug} album={album} L={L} locale={locale} t={t} />
         ))}

@@ -91,14 +91,7 @@ export default function Footer({ locale }: FooterProps) {
       borderTop:  "1px solid rgba(200,168,75,0.12)",
       background: "var(--bg-0)",
     }}>
-      <div style={{
-        maxWidth: 1440,
-        margin:   "0 auto",
-        display:  "grid",
-        gridTemplateColumns: "1fr auto 1fr",
-        gap:      40,
-        alignItems: "start",
-      }}>
+      <div className="footer-grid">
 
         {/* ── Left: logo + copyright ── */}
         <div>
@@ -144,10 +137,10 @@ export default function Footer({ locale }: FooterProps) {
           <div style={{ display: "flex", gap: 20 }}>
             {[
               { href: "https://youtube.com/@husariabeats", icon: <IconYouTube />, label: "YouTube" },
-              { href: "https://open.spotify.com/artist/husariabeats", icon: <IconSpotify />, label: "Spotify" },
+              { href: "https://open.spotify.com/artist/0iTZ9rwsAATUClWjynjF0r", icon: <IconSpotify />, label: "Spotify" },
               { href: "https://tiktok.com/@husariabeats", icon: <IconTikTok />, label: "TikTok" },
               { href: "https://instagram.com/husariabeats", icon: <IconInstagram />, label: "Instagram" },
-              { href: "https://facebook.com/husariabeats", icon: <IconFacebook />, label: "Facebook" },
+              { href: "https://www.facebook.com/profile.php?id=61579521757181", icon: <IconFacebook />, label: "Facebook" },
             ].map(({ href, icon, label }) => (
               <a
                 key={label}

@@ -4,15 +4,17 @@
  * Responsibilities:
  *   - Render full-viewport hero with HeroBackground, logo mark, H1, CTA links
  *   - Stats strip (4 metrics)
- *   - Social platform cards grid (data from @/data/socials.json)
+ *   - Social platform cards grid — live counts from /api/social-stats
+ *   - Contact section
  *   - Newsletter subscribe form (stub — no API call)
  *
- * Reads socials from @/data/socials.json.
+ * Live social counts fetched client-side from /api/social-stats (YouTube + Spotify live,
+ * Instagram/TikTok/Facebook from env vars). Falls back to socials.json on error.
  * i18n via next-intl useTranslations("about").
  */
 "use client";
 
-import { useState, CSSProperties } from "react";
+import { useState, useEffect, CSSProperties } from "react";
 import { useTranslations, useLocale } from "next-intl";
 import Link from "next/link";
 import socialsData from "@/data/socials.json";
@@ -146,14 +148,24 @@ export default function AboutPage() {
   const [email,       setEmail]       = useState("");
   const [subscribed,  setSubscribed]  = useState(false);
   const [hoverSocial, setHoverSocial] = useState<string | null>(null);
+  /** Live counts from /api/social-stats — keyed by lowercase platform name */
+  const [liveCounts,  setLiveCounts]  = useState<Record<string, string>>({});
+
+  /* Fetch live social counts on mount */
+  useEffect(() => {
+    fetch("/api/social-stats")
+      .then((r) => r.json())
+      .then((data: Record<string, string>) => setLiveCounts(data))
+      .catch(() => { /* silent — falls back to socials.json values */ });
+  }, []);
 
   /* Stats labels come from i18n; the values are fixed content. */
   const statsLabels = t.raw("statsLabel") as string[];
   const stats: [string, string][] = [
-    ["38",     statsLabels[0]],
-    ["1.8M",   statsLabels[1]],
-    ["12",     statsLabels[2]],
-    ["1410→",  statsLabels[3]],
+    ["21",     statsLabels[0]],
+    ["42",     statsLabels[1]],
+    ["6",      statsLabels[2]],
+    ["1241→",  statsLabels[3]],
   ];
 
   /**
@@ -413,7 +425,10 @@ export default function AboutPage() {
           gap:                 14,
         }}>
           {SOCIALS.map((s) => {
-            const isHov = hoverSocial === s.name;
+            const isHov    = hoverSocial === s.name;
+            const liveKey  = s.name.toLowerCase();
+            /** Only show count if live API returned a value — no fake fallback */
+            const dispSubs = liveCounts[liveKey] ?? "";
             return (
               <a
                 key={s.name}
@@ -468,7 +483,8 @@ export default function AboutPage() {
                   {s.handle}
                 </div>
 
-                {/* Subscriber / follower count */}
+                {/* Subscriber / follower count — only rendered when live count available */}
+                {dispSubs && (
                 <div style={{
                   fontFamily:    "var(--mono)",
                   fontSize:      11,
@@ -476,8 +492,9 @@ export default function AboutPage() {
                   fontWeight:    700,
                   letterSpacing: "0.04em",
                 }}>
-                  {s.subs}
+                  {dispSubs}
                 </div>
+                )}
               </a>
             );
           })}
@@ -598,6 +615,118 @@ export default function AboutPage() {
           </div>
         </div>
       </section>
+
+      {/* ════════════════════════════════════════════
+          CONTACT — press, booking, project info
+          (commented out — may restore later)
+          ════════════════════════════════════════════ */}
+      {/* <section style={{
+        padding:      "80px 36px 120px",
+        borderTop:    "1px solid rgba(200,168,75,0.08)",
+        background:   "var(--bg-1)",
+      }}>
+        <div style={{ maxWidth: 1280, margin: "0 auto" }}>
+
+          <div style={{ marginBottom: 56 }}>
+            <div style={monoLabel({ color: "var(--gold)", marginBottom: 18, display: "block" })}>
+              ◆ KONTAKT / CONTACT
+            </div>
+            <h2 style={{
+              fontFamily:    "var(--serif)",
+              fontSize:      "clamp(40px,5vw,72px)",
+              fontWeight:    600,
+              color:         "var(--cream)",
+              letterSpacing: "-0.02em",
+              lineHeight:    1,
+            }}>
+              {locale === "pl" ? "Napisz do nas" : "Get in touch"}
+            </h2>
+          </div>
+
+          <div style={{
+            display:             "grid",
+            gridTemplateColumns: "repeat(3,1fr)",
+            gap:                 28,
+          }}
+            className="contact-grid"
+          >
+            <div style={{
+              padding:      "32px 28px",
+              background:   "var(--bg-0)",
+              border:       "1px solid rgba(200,168,75,0.12)",
+              borderRadius: 6,
+            }}>
+              <div style={monoLabel({ color: "var(--gold)", marginBottom: 14, display: "block" })}>
+                ◉ {locale === "pl" ? "OGÓLNY / PRASA" : "GENERAL / PRESS"}
+              </div>
+              <p style={{ fontFamily: "var(--serif)", fontSize: 16, color: "var(--muted)", lineHeight: 1.6, marginBottom: 20 }}>
+                {locale === "pl"
+                  ? "Zapytania prasowe, wywiady, współpraca medialna."
+                  : "Press enquiries, interviews, media partnerships."}
+              </p>
+              <a
+                href="mailto:kontakt@husariabeats.com"
+                style={{
+                  fontFamily:    "var(--mono)",
+                  fontSize:      12,
+                  color:         "var(--cream)",
+                  letterSpacing: "0.08em",
+                  borderBottom:  "1px solid rgba(200,168,75,0.3)",
+                  paddingBottom: 2,
+                }}
+              >
+                kontakt@husariabeats.com
+              </a>
+            </div>
+
+            <div style={{
+              padding:      "32px 28px",
+              background:   "var(--bg-0)",
+              border:       "1px solid rgba(200,168,75,0.12)",
+              borderRadius: 6,
+            }}>
+              <div style={monoLabel({ color: "var(--gold)", marginBottom: 14, display: "block" })}>
+                ◉ {locale === "pl" ? "WSPÓŁPRACA" : "COLLABORATION"}
+              </div>
+              <p style={{ fontFamily: "var(--serif)", fontSize: 16, color: "var(--muted)", lineHeight: 1.6, marginBottom: 20 }}>
+                {locale === "pl"
+                  ? "Propozycje współpracy, licencjonowanie muzyki, projekty edukacyjne."
+                  : "Collaboration proposals, music licensing, educational projects."}
+              </p>
+              <a
+                href="mailto:kontakt@husariabeats.com"
+                style={{
+                  fontFamily:    "var(--mono)",
+                  fontSize:      12,
+                  color:         "var(--cream)",
+                  letterSpacing: "0.08em",
+                  borderBottom:  "1px solid rgba(200,168,75,0.3)",
+                  paddingBottom: 2,
+                }}
+              >
+                kontakt@husariabeats.com
+              </a>
+            </div>
+
+            <div style={{
+              padding:      "32px 28px",
+              background:   "var(--bg-0)",
+              border:       "1px solid rgba(200,168,75,0.12)",
+              borderRadius: 6,
+            }}>
+              <div style={monoLabel({ color: "var(--gold)", marginBottom: 14, display: "block" })}>
+                ◉ {locale === "pl" ? "O PROJEKCIE" : "ABOUT THE PROJECT"}
+              </div>
+              <p style={{ fontFamily: "var(--serif)", fontSize: 16, color: "var(--muted)", lineHeight: 1.6 }}>
+                {locale === "pl"
+                  ? "HusariaBeats to niezależny projekt muzyczny opowiadający historię Polski przez oryginalną muzykę. Każda piosenka to osobna lekcja historii."
+                  : "HusariaBeats is an independent music project telling Poland's history through original music. Each song is a separate history lesson."}
+              </p>
+            </div>
+          </div>
+
+        </div>
+      </section> */}
 
     </div>
   );

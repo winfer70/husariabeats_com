@@ -250,3 +250,24 @@ main {
 @media (max-width: 768px) {
   .nav-locale-desktop { display: none !important; }
 }
+
+/* Contact section 3-col grid */
+.contact-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 28px;
+}
+@media (max-width: 768px) {
+  .contact-grid {
+    grid-template-columns: 1fr;
+    gap: 16px;
+  }
+}
+
+/* Co Dalej — topics appear above form on mobile */
+.voting-layout-form   { order: 2; }
+.voting-layout-topics { order: 1; }
+@media (min-width: 769px) {
+  .voting-layout-form   { order: 1; }
+  .voting-layout-topics { order: 2; }
+}

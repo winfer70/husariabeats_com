@@ -647,10 +647,12 @@ export default function WhatsNextPage() {
       <div className="voting-layout">
 
         {/* Left: sticky submission form */}
-        <SubmissionForm onSubmit={handleNewTopic} onEmailChange={setVoterEmail} t={t} />
+        <div className="voting-layout-form">
+          <SubmissionForm onSubmit={handleNewTopic} onEmailChange={setVoterEmail} t={t} />
+        </div>
 
         {/* Right: sorted topic list */}
-        <div>
+        <div className="voting-layout-topics">
           {/* Ranking header */}
           <div style={{
             display:        "flex",

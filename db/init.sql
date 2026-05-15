@@ -18,7 +18,7 @@ CREATE TABLE IF NOT EXISTS songs (
     title_en        VARCHAR(200),
     -- Production status lifecycle
     status          VARCHAR(50)     DEFAULT 'scaffold'
-                    CHECK (status IN ('scaffold','audio_ready','sync_done','render_done','scheduled','released')),
+                    CHECK (status IN ('scaffold','audio_ready','sync_done','render_done','scheduled','queued','released')),
     album_slug      VARCHAR(100),
     year_event      INTEGER,
     -- Historical era classification
@@ -83,17 +83,19 @@ CREATE TABLE IF NOT EXISTS albums (
 
 -- ── Release queue ─────────────────────────────────────────────────────────────
 -- Scheduled release entries consumed by n8n daily cron.
--- platforms array controls which platforms are targeted per entry.
--- status: queued → released | skipped
+-- status: pending → releasing → released | failed
 CREATE TABLE IF NOT EXISTS release_queue (
     id              SERIAL          PRIMARY KEY,
     song_id         VARCHAR(100)    REFERENCES songs(slug) ON DELETE CASCADE,
     scheduled_at    TIMESTAMPTZ     NOT NULL,
     -- platforms to post to on this release
     platforms       TEXT[]          DEFAULT '{youtube,facebook,instagram,tiktok}',
-    -- queued | released | skipped
-    status          VARCHAR(50)     DEFAULT 'queued'
-                    CHECK (status IN ('queued','released','skipped')),
+    -- pending | releasing | released | failed
+    status          VARCHAR(50)     DEFAULT 'pending'
+                    CHECK (status IN ('pending','releasing','released','failed')),
+    topic_id               INT          REFERENCES topics(id) ON DELETE SET NULL,
+    upload_post_request_id VARCHAR(100),
+    released_at            TIMESTAMPTZ,
     created_at      TIMESTAMPTZ     DEFAULT NOW()
 );
 

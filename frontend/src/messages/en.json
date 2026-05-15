@@ -69,7 +69,7 @@
     "nextDrop":     "Next drop in {d} days · {album}",
     "enterTimeline":"Enter the timeline",
     "seeAlbums":    "See albums",
-    "statsLabel":   ["Tracks released", "Subscribers", "Albums", "Years covered"],
+    "statsLabel":   ["Tracks released", "YouTube videos", "Albums", "Years covered"],
     "followBadge":  "FOLLOW",
     "followTitle":  "Wherever you listen",
     "newsletter":   "Notify me when the next song drops",

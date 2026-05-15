@@ -2,7 +2,7 @@
   "updatedAt": "2026-05-03T15:34:41.039Z",
   "createdAt": "2026-05-02T22:10:10.056Z",
   "id": "bB7YCOGVtKm6oZz0",
-  "name": "HusariaBeats — Daily Release Automation",
+  "name": "HusariaBeats \u2014 Daily Release Automation",
   "description": null,
   "active": false,
   "isArchived": false,
@@ -139,7 +139,7 @@
     },
     {
       "parameters": {
-        "jsCode": "// ══════════════════════════════════════════════════════════\n// PLACEHOLDER: TikTok Post\n// ══════════════════════════════════════════════════════════\n// Requires: video.publish scope approved in TikTok Content API audit\n//\n// When ready:\n//   1. POST https://open.tiktokapis.com/v2/post/publish/video/init/\n//      Body: { post_info: {...}, source_info: { source: 'FILE_UPLOAD' } }\n//   2. Upload video file\n//   3. POST .../complete/\n// ══════════════════════════════════════════════════════════\n\nconst { song, queueItem, youtubeId } = $input.first().json;\nconsole.log('TODO: Post to TikTok for song:', song.slug);\n\nreturn [{ json: { queueItem, song, youtubeId, tiktokPosted: false, tiktokSkipped: true } }];"
+        "jsCode": "// \u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\n// PLACEHOLDER: TikTok Post\n// \u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\n// Requires: video.publish scope approved in TikTok Content API audit\n//\n// When ready:\n//   1. POST https://open.tiktokapis.com/v2/post/publish/video/init/\n//      Body: { post_info: {...}, source_info: { source: 'FILE_UPLOAD' } }\n//   2. Upload video file\n//   3. POST .../complete/\n// \u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\n\nconst { song, queueItem, youtubeId } = $input.first().json;\nconsole.log('TODO: Post to TikTok for song:', song.slug);\n\nreturn [{ json: { queueItem, song, youtubeId, tiktokPosted: false, tiktokSkipped: true } }];"
       },
       "id": "65176f6e-7e1c-4ae2-a10d-b2e9fd635eee",
       "name": "TikTok Post (STUB)1",
@@ -149,11 +149,11 @@
         34896,
         5312
       ],
-      "notes": "STUB — replace with TikTok Content API nodes when audit approved."
+      "notes": "STUB \u2014 replace with TikTok Content API nodes when audit approved."
     },
     {
       "parameters": {
-        "jsCode": "// ══════════════════════════════════════════════════════════\n// PLACEHOLDER: Instagram Post\n// ══════════════════════════════════════════════════════════\n// Requires: instagram_content_publish permission approved in Meta App Review\n// Instagram Business account must be linked to Facebook Page\n//\n// When ready:\n//   1. POST https://graph.facebook.com/v18.0/{ig-user-id}/media\n//      Body: { media_type: 'REELS', video_url: ..., caption: ... }\n//   2. POST https://graph.facebook.com/v18.0/{ig-user-id}/media_publish\n//      Body: { creation_id: ... }\n// ══════════════════════════════════════════════════════════\n\nconst { song, queueItem, youtubeId } = $input.first().json;\nconsole.log('TODO: Post to Instagram for song:', song.slug);\n\nreturn [{ json: { queueItem, song, youtubeId, igPosted: false, igSkipped: true } }];"
+        "jsCode": "// \u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\n// PLACEHOLDER: Instagram Post\n// \u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\n// Requires: instagram_content_publish permission approved in Meta App Review\n// Instagram Business account must be linked to Facebook Page\n//\n// When ready:\n//   1. POST https://graph.facebook.com/v18.0/{ig-user-id}/media\n//      Body: { media_type: 'REELS', video_url: ..., caption: ... }\n//   2. POST https://graph.facebook.com/v18.0/{ig-user-id}/media_publish\n//      Body: { creation_id: ... }\n// \u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\n\nconst { song, queueItem, youtubeId } = $input.first().json;\nconsole.log('TODO: Post to Instagram for song:', song.slug);\n\nreturn [{ json: { queueItem, song, youtubeId, igPosted: false, igSkipped: true } }];"
       },
       "id": "83d7a0ec-9c4e-4e8b-b06b-4699198a13d9",
       "name": "Instagram Post (STUB)1",
@@ -163,11 +163,11 @@
         34704,
         5312
       ],
-      "notes": "STUB — replace with Instagram Graph API nodes when Meta App Review approved."
+      "notes": "STUB \u2014 replace with Instagram Graph API nodes when Meta App Review approved."
     },
     {
       "parameters": {
-        "jsCode": "// ══════════════════════════════════════════════════════════\n// PLACEHOLDER: Facebook Page Post\n// ══════════════════════════════════════════════════════════\n// Requires: pages_manage_posts permission approved in Meta App Review\n//\n// When ready, replace with:\n//   - HTTP Request to https://graph.facebook.com/v18.0/{page-id}/feed\n//   - Auth: Page Access Token (long-lived, from Meta)\n//   - Body: { message: caption, link: 'https://youtu.be/' + youtubeId }\n// ══════════════════════════════════════════════════════════\n\nconst song = $('Parse meta.json1').first().json.song;\nconst queueItem = $('Parse meta.json1').first().json.queueItem;\nconst youtubeId = $('Upload to YouTube1').first().json.id;\nconsole.log('TODO: Post to Facebook for song:', song.slug, '| YouTube:', youtubeId);\n\nreturn [{ json: { queueItem, song, youtubeId, fbPosted: false, fbSkipped: true } }];"
+        "jsCode": "// \u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\n// PLACEHOLDER: Facebook Page Post\n// \u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\n// Requires: pages_manage_posts permission approved in Meta App Review\n//\n// When ready, replace with:\n//   - HTTP Request to https://graph.facebook.com/v18.0/{page-id}/feed\n//   - Auth: Page Access Token (long-lived, from Meta)\n//   - Body: { message: caption, link: 'https://youtu.be/' + youtubeId }\n// \u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\n\nconst song = $('Parse meta.json1').first().json.song;\nconst queueItem = $('Parse meta.json1').first().json.queueItem;\nconst youtubeId = $('Upload to YouTube1').first().json.id;\nconsole.log('TODO: Post to Facebook for song:', song.slug, '| YouTube:', youtubeId);\n\nreturn [{ json: { queueItem, song, youtubeId, fbPosted: false, fbSkipped: true } }];"
       },
       "id": "9b6d2205-a648-4c5b-bb56-d2b84d6e6c27",
       "name": "Facebook Post (STUB)1",
@@ -177,7 +177,7 @@
         34496,
         5312
       ],
-      "notes": "STUB — replace with FB Graph API HTTP node when Meta App Review approved."
+      "notes": "STUB \u2014 replace with FB Graph API HTTP node when Meta App Review approved."
     },
     {
       "parameters": {
@@ -208,7 +208,7 @@
         "options": {
           "defaultLanguage": "en",
           "description": "={{ $('Parse meta.json1').first().json.descriptionEn }}",
-          "privacyStatus": "private",
+          "privacyStatus": "public",
           "tags": "={{ $('Parse meta.json1').first().json.tagsEn }}"
         }
       },
@@ -336,7 +336,7 @@
         "options": {
           "defaultLanguage": "pl",
           "description": "={{ $('Parse meta.json1').first().json.descriptionPl }}",
-          "privacyStatus": "private",
+          "privacyStatus": "public",
           "tags": "={{ $('Parse meta.json1').first().json.tagsPl }}"
         }
       },
@@ -387,7 +387,7 @@
     },
     {
       "parameters": {
-        "jsCode": "// Parse meta.json and build YouTube upload context for both PL and EN.\n// Required meta.json fields:\n//   title_pl, title_en         — YouTube video titles\n//   description_pl             — Polish description\n//   description_en             — English description\n//   tags_pl, tags_en           — YouTube tags arrays\n\nconst song = $('Extract Song Details1').first().json.song;\nconst queueItem = $('Extract Song Details1').first().json.queueItem;\nconst videoFileId = $('Extract Video File ID1').first().json.videoFileId;\nconst folderId = $('Extract Folder ID1').first().json.folderId;\n\nlet meta;\ntry {\n  meta = JSON.parse($input.first().json.data);\n} catch(e) {\n  throw new Error(`meta.json is not valid JSON: ${e.message}`);\n}\n\n// Validate required PL fields\nif (!meta.title_pl) throw new Error('meta.json missing: title_pl');\nif (!meta.description_pl) throw new Error('meta.json missing: description_pl');\nif (!meta.tags_pl || !meta.tags_pl.length) throw new Error('meta.json missing: tags_pl (array)');\n\n// Validate required EN fields\nif (!meta.title_en) throw new Error('meta.json missing: title_en');\nif (!meta.description_en) throw new Error('meta.json missing: description_en');\nif (!meta.tags_en || !meta.tags_en.length) throw new Error('meta.json missing: tags_en (array)');\n\n// Build PL upload data\nconst descPlParts = [meta.description_pl];\nconst descPl = descPlParts.join('\\n\\n');\nconst tagsPl = Array.isArray(meta.tags_pl) ? meta.tags_pl.join(',') : meta.tags_pl;\n\n// Build EN upload data\nconst descEnParts = [meta.description_en];\nconst descEn = descEnParts.join('\\n\\n');\n\n// Optional album playlist fields\nconst albumNamePl = meta.album_name_pl || null;\nconst albumNameEn = meta.album_name_en || null;\nconst tagsEn = Array.isArray(meta.tags_en) ? meta.tags_en.join(',') : meta.tags_en;\n\nreturn [{ json: {\n  videoFileId, folderId,\n  titlePl: meta.title_pl, descriptionPl: descPl, tagsPl,\n  titleEn: meta.title_en, descriptionEn: descEn, tagsEn,\n  song, queueItem,\n  albumNamePl, albumNameEn\n} }];"
+        "jsCode": "// Parse meta.json and build YouTube upload context for both PL and EN.\n// Required meta.json fields:\n//   title_pl, title_en         \u2014 YouTube video titles\n//   description_pl             \u2014 Polish description\n//   description_en             \u2014 English description\n//   tags_pl, tags_en           \u2014 YouTube tags arrays\n\nconst song = $('Extract Song Details1').first().json.song;\nconst queueItem = $('Extract Song Details1').first().json.queueItem;\nconst videoFileId = $('Extract Video File ID1').first().json.videoFileId;\nconst folderId = $('Extract Folder ID1').first().json.folderId;\n\nlet meta;\ntry {\n  meta = JSON.parse($input.first().json.data);\n} catch(e) {\n  throw new Error(`meta.json is not valid JSON: ${e.message}`);\n}\n\n// Validate required PL fields\nif (!meta.title_pl) throw new Error('meta.json missing: title_pl');\nif (!meta.description_pl) throw new Error('meta.json missing: description_pl');\nif (!meta.tags_pl || !meta.tags_pl.length) throw new Error('meta.json missing: tags_pl (array)');\n\n// Validate required EN fields\nif (!meta.title_en) throw new Error('meta.json missing: title_en');\nif (!meta.description_en) throw new Error('meta.json missing: description_en');\nif (!meta.tags_en || !meta.tags_en.length) throw new Error('meta.json missing: tags_en (array)');\n\n// Build PL upload data\nconst descPlParts = [meta.description_pl];\nconst descPl = descPlParts.join('\\n\\n');\nconst tagsPl = Array.isArray(meta.tags_pl) ? meta.tags_pl.join(',') : meta.tags_pl;\n\n// Build EN upload data\nconst descEnParts = [meta.description_en];\nconst descEn = descEnParts.join('\\n\\n');\n\n// Optional album playlist fields\nconst albumNamePl = meta.album_name_pl || null;\nconst albumNameEn = meta.album_name_en || null;\nconst tagsEn = Array.isArray(meta.tags_en) ? meta.tags_en.join(',') : meta.tags_en;\n\nreturn [{ json: {\n  videoFileId, folderId,\n  titlePl: meta.title_pl, descriptionPl: descPl, tagsPl,\n  titleEn: meta.title_en, descriptionEn: descEn, tagsEn,\n  song, queueItem,\n  albumNamePl, albumNameEn\n} }];"
       },
       "id": "07f42ac7-966e-4f67-b3d8-25d3248cf03d",
       "name": "Parse meta.json1",
@@ -430,7 +430,7 @@
     },
     {
       "parameters": {
-        "jsCode": "// Extract meta.json file ID. Throw if missing — meta.json is required.\nconst slug = $('Extract Song Details1').first().json.song.slug;\nconst videoFileId = $('Extract Video File ID1').first().json.videoFileId;\nconst files = $input.first().json.files || [];\nif (!files.length) {\n  throw new Error(`meta.json not found in Drive folder for slug '${slug}'. Create husariabeats-releases/${slug}/meta.json with title_pl, description_pl, description_en, tags fields.`);\n}\nreturn [{ json: { metaFileId: files[0].id, videoFileId, slug } }];"
+        "jsCode": "// Extract meta.json file ID. Throw if missing \u2014 meta.json is required.\nconst slug = $('Extract Song Details1').first().json.song.slug;\nconst videoFileId = $('Extract Video File ID1').first().json.videoFileId;\nconst files = $input.first().json.files || [];\nif (!files.length) {\n  throw new Error(`meta.json not found in Drive folder for slug '${slug}'. Create husariabeats-releases/${slug}/meta.json with title_pl, description_pl, description_en, tags fields.`);\n}\nreturn [{ json: { metaFileId: files[0].id, videoFileId, slug } }];"
       },
       "id": "d7bef0b1-3918-432f-b51a-e983c6a3f26d",
       "name": "Extract meta.json ID1",
@@ -440,7 +440,7 @@
         32304,
         5312
       ],
-      "notes": "Extracts meta.json file ID. Throws if missing — meta.json is required for every release."
+      "notes": "Extracts meta.json file ID. Throws if missing \u2014 meta.json is required for every release."
     },
     {
       "parameters": {
@@ -580,7 +580,7 @@
     },
     {
       "parameters": {
-        "jsCode": "// Find the specific song from the queue item\n// n8n splits array HTTP response into individual items — use $input.all()\n// DB column is song_id (not song_slug)\nconst queueItem = $('Restore Queue Item1').first().json.item;\nconst songs = $input.all().map(i => i.json);\nconst songId = queueItem.song_id || queueItem.song_slug;\nconst song = songs.find(s => s.slug === songId);\n\nif (!song) {\n  throw new Error(`Song '${songId}' not found in songs list`);\n}\n\nreturn [{ json: { queueItem, song } }];"
+        "jsCode": "// Find the specific song from the queue item\n// n8n splits array HTTP response into individual items \u2014 use $input.all()\n// DB column is song_id (not song_slug)\nconst queueItem = $('Restore Queue Item1').first().json.item;\nconst songs = $input.all().map(i => i.json);\nconst songId = queueItem.song_id || queueItem.song_slug;\nconst song = songs.find(s => s.slug === songId);\n\nif (!song) {\n  throw new Error(`Song '${songId}' not found in songs list`);\n}\n\nreturn [{ json: { queueItem, song } }];"
       },
       "id": "887d6937-455b-4060-85af-9fdc3aba7f1b",
       "name": "Extract Song Details1",
@@ -722,11 +722,11 @@
         29904,
         5424
       ],
-      "notes": "True → continue. False → stop (no release today)."
+      "notes": "True \u2192 continue. False \u2192 stop (no release today)."
     },
     {
       "parameters": {
-        "jsCode": "// Filter for queued items scheduled today (Warsaw time)\n// n8n splits array HTTP response into individual items — iterate directly\nconst today = new Date().toLocaleDateString('sv-SE', { timeZone: 'Europe/Warsaw' });\nconst items = $input.all();\n\nconst todayItem = items\n  .map(i => i.json)\n  .find(e => {\n    const scheduledDate = e.scheduled_at ? String(e.scheduled_at).substring(0, 10) : null;\n    return e.status === 'queued' && scheduledDate === today;\n  });\n\nif (!todayItem) {\n  return [{ json: { hasItem: false } }];\n}\nreturn [{ json: { hasItem: true, item: todayItem } }];"
+        "jsCode": "// Filter for queued items scheduled today (Warsaw time)\n// n8n splits array HTTP response into individual items \u2014 iterate directly\nconst today = new Date().toLocaleDateString('sv-SE', { timeZone: 'Europe/Warsaw' });\nconst items = $input.all();\n\nconst todayItem = items\n  .map(i => i.json)\n  .find(e => {\n    const scheduledDate = e.scheduled_at ? String(e.scheduled_at).substring(0, 10) : null;\n    return e.status === 'queued' && scheduledDate === today;\n  });\n\nif (!todayItem) {\n  return [{ json: { hasItem: false } }];\n}\nreturn [{ json: { hasItem: true, item: todayItem } }];"
       },
       "id": "dcb56d24-8a72-4860-b0bb-036f8e8b4c25",
       "name": "Find Today's Release1",
@@ -1205,7 +1205,7 @@
         "url": "={{ 'https://husariabeats.com/api/albums/' + $json.albumSlug }}",
         "options": {}
       },
-      "notes": "GET /api/albums/{slug} — returns album with youtube_playlist_id_pl/en"
+      "notes": "GET /api/albums/{slug} \u2014 returns album with youtube_playlist_id_pl/en"
     },
     {
       "id": "ad811432-357b-416b-b47a-7ae4b84ed49a",
@@ -1221,7 +1221,7 @@
         "url": "={{ 'https://husariabeats.com/api/albums/' + $json.albumSlug }}",
         "options": {}
       },
-      "notes": "GET /api/albums/{slug} — returns album with youtube_playlist_id_pl/en"
+      "notes": "GET /api/albums/{slug} \u2014 returns album with youtube_playlist_id_pl/en"
     },
     {
       "parameters": {
@@ -1240,7 +1240,7 @@
         35516,
         5312
       ],
-      "notes": "Flushes Next.js ISR cache for updated pages — husariabeats.com shows new song immediately."
+      "notes": "Flushes Next.js ISR cache for updated pages \u2014 husariabeats.com shows new song immediately."
     }
   ],
   "connections": {

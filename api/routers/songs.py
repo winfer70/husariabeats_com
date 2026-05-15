@@ -15,17 +15,28 @@
 from __future__ import annotations
 
 import json as _json
+import os
+from datetime import date as _date, datetime as _dt
 
 import databases
+import httpx as _httpx
 from fastapi import APIRouter, HTTPException, Query
 from pydantic import BaseModel, field_validator
 
 # Injected by main.py lifespan
 db: databases.Database | None = None
 
+# Filesystem path to releases dir — injected by main.py
+RELEASES_DIR: str = ""
+
+# YouTube OAuth credentials — injected by main.py; endpoint returns 503 if unset
+YT_CLIENT_ID:     str = ""
+YT_CLIENT_SECRET: str = ""
+YT_REFRESH_TOKEN: str = ""
+
 router = APIRouter(tags=["songs"])
 
-_VALID_STATUSES = {"scaffold", "audio_ready", "sync_done", "render_done", "scheduled", "released"}
+_VALID_STATUSES = {"scaffold", "audio_ready", "sync_done", "render_done", "ready_to_release", "queued", "released"}
 _VALID_ERAS     = {"medieval", "partitions", "wwi", "wwii", "cold_war", "modern"}
 
 # Shared SELECT column list used by GET, POST, and PATCH RETURNING
@@ -33,6 +44,7 @@ _SELECT_COLS = """
     slug, title_pl, title_en, status, album_slug,
     year_event, era, image_path,
     youtube_id_pl, youtube_id_en,
+    youtube_short_pl, youtube_short_en,
     spotify_url, apple_music_url, amazon_url, youtube_music_url, itunes_url,
     release_date::text AS release_date,
     subtitle_pl, subtitle_en,
@@ -53,6 +65,8 @@ class SongOut(BaseModel):
     image_path:        str | None
     youtube_id_pl:     str | None
     youtube_id_en:     str | None
+    youtube_short_pl:  str | None
+    youtube_short_en:  str | None
     spotify_url:       str | None
     apple_music_url:   str | None
     amazon_url:        str | None
@@ -89,6 +103,8 @@ class SongUpdate(BaseModel):
     image_path:        str | None = None
     youtube_id_pl:     str | None = None
     youtube_id_en:     str | None = None
+    youtube_short_pl:  str | None = None
+    youtube_short_en:  str | None = None
     spotify_url:       str | None = None
     apple_music_url:   str | None = None
     amazon_url:        str | None = None
@@ -297,6 +313,10 @@ async def update_song(slug: str, body: SongUpdate):
         )
         return dict(row)
 
+    # asyncpg requires datetime objects for TIMESTAMPTZ columns, not strings
+    if "release_date" in updates and isinstance(updates["release_date"], str):
+        updates["release_date"] = _dt.fromisoformat(updates["release_date"])
+
     set_clauses  = ", ".join(f"{col} = :{col}" for col in updates)
     updates["slug"] = slug  # Bind the WHERE parameter last to avoid collision
 
@@ -312,6 +332,116 @@ async def update_song(slug: str, body: SongUpdate):
     if not row:
         raise HTTPException(status_code=500, detail="Update failed")
     return dict(row)
+
+
+@router.get("/songs/{slug}/files")
+async def check_song_files(slug: str):
+    """
+    Check which release files exist on disk for a given song slug.
+
+    Looks in RELEASES_DIR/{slug}/ for the five expected files:
+      {slug}_pl.mp4, {slug}_en.mp4, {slug}-feed-pl.mp4,
+      {slug}-feed-en.mp4, {slug}_thumb.jpg
+
+    Returns a dict of bool flags plus a 'missing' list of key names.
+    """
+    if not RELEASES_DIR:
+        raise HTTPException(status_code=503, detail="RELEASES_DIR not configured")
+    base = os.path.join(RELEASES_DIR, slug)
+    files = {
+        "pl_mp4":      os.path.exists(os.path.join(base, f"{slug}_pl.mp4")),
+        "en_mp4":      os.path.exists(os.path.join(base, f"{slug}_en.mp4")),
+        "feed_pl_mp4": os.path.exists(os.path.join(base, f"{slug}-feed-pl.mp4")),
+        "feed_en_mp4": os.path.exists(os.path.join(base, f"{slug}-feed-en.mp4")),
+        "thumb":       os.path.exists(os.path.join(base, f"{slug}_thumb.jpg")),
+    }
+    missing = [k for k, v in files.items() if not v]
+    return {**files, "missing": missing}
+
+
+@router.post("/songs/{slug}/sync_youtube")
+async def sync_youtube_description(slug: str):
+    """
+    Append streaming platform links to the YouTube video description(s) for a song.
+
+    Requires YOUTUBE_CLIENT_ID, YOUTUBE_CLIENT_SECRET, YOUTUBE_REFRESH_TOKEN env vars.
+    Updates both youtube_id_pl and youtube_id_en (whichever are set).
+    Idempotent — replaces any existing streaming block before appending the new one.
+
+    Returns {"synced": {"pl": bool, "en": bool}}.
+    """
+    if not YT_CLIENT_ID or not YT_REFRESH_TOKEN:
+        raise HTTPException(status_code=503, detail="YouTube OAuth credentials not configured")
+
+    row = await db.fetch_one(
+        f"SELECT {_SELECT_COLS} FROM songs WHERE slug = :slug",
+        {"slug": slug},
+    )
+    if not row:
+        raise HTTPException(status_code=404, detail=f"Song '{slug}' not found")
+    song = dict(row)
+
+    if not song.get("youtube_id_pl") and not song.get("youtube_id_en"):
+        raise HTTPException(status_code=422, detail="Song has no YouTube IDs set")
+
+    # Build streaming links section (only populated URLs)
+    streaming_lines = []
+    if song.get("spotify_url"):       streaming_lines.append(f"Spotify: {song['spotify_url']}")
+    if song.get("apple_music_url"):   streaming_lines.append(f"Apple Music: {song['apple_music_url']}")
+    if song.get("amazon_url"):        streaming_lines.append(f"Amazon Music: {song['amazon_url']}")
+    if song.get("youtube_music_url"): streaming_lines.append(f"YouTube Music: {song['youtube_music_url']}")
+    if song.get("itunes_url"):        streaming_lines.append(f"iTunes: {song['itunes_url']}")
+
+    if not streaming_lines:
+        raise HTTPException(status_code=422, detail="No streaming URLs set on this song")
+
+    _STREAMING_SEP = "\n─────────────────────\n🎵 SŁUCHAJ TUTAJ"
+    streaming_block = _STREAMING_SEP + " / LISTEN HERE:\n" + "\n".join(streaming_lines)
+
+    async with _httpx.AsyncClient() as client:
+        # Exchange refresh token for access token
+        token_resp = await client.post("https://oauth2.googleapis.com/token", data={
+            "client_id":     YT_CLIENT_ID,
+            "client_secret": YT_CLIENT_SECRET,
+            "refresh_token": YT_REFRESH_TOKEN,
+            "grant_type":    "refresh_token",
+        })
+        if token_resp.status_code != 200:
+            raise HTTPException(
+                status_code=502,
+                detail=f"Token refresh failed: {token_resp.text[:200]}",
+            )
+        access_token = token_resp.json()["access_token"]
+        auth = {"Authorization": f"Bearer {access_token}"}
+
+        results: dict = {}
+        for lang, yt_id in [("pl", song.get("youtube_id_pl")), ("en", song.get("youtube_id_en"))]:
+            if not yt_id:
+                results[lang] = False
+                continue
+            # Fetch current video snippet
+            info = await client.get(
+                f"https://www.googleapis.com/youtube/v3/videos?part=snippet&id={yt_id}",
+                headers=auth,
+            )
+            items = info.json().get("items", []) if info.status_code == 200 else []
+            if not items:
+                results[lang] = False
+                continue
+            snippet = items[0]["snippet"]
+            # Strip old streaming block (idempotent) then append fresh one
+            base_desc = snippet.get("description", "")
+            if _STREAMING_SEP in base_desc:
+                base_desc = base_desc[:base_desc.index(_STREAMING_SEP)]
+            snippet["description"] = base_desc.rstrip() + "\n\n" + streaming_block
+            upd = await client.put(
+                "https://www.googleapis.com/youtube/v3/videos?part=snippet",
+                json={"id": yt_id, "snippet": snippet},
+                headers=auth,
+            )
+            results[lang] = upd.status_code == 200
+
+    return {"synced": results}
 
 
 @router.delete("/songs/{slug}", status_code=204)

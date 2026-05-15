@@ -121,6 +121,7 @@ export default function NavBar({ locale, albums }: NavBarProps) {
   });
 
   return (
+    <>
     <nav style={{
       position:            "fixed",
       top: 0, left: 0, right: 0,
@@ -284,115 +285,6 @@ export default function NavBar({ locale, albums }: NavBarProps) {
           )}
         </button>
 
-        {/* Mobile full-screen overlay — rendered outside the flex row via portal-like fixed position */}
-        {menuOpen && (
-          <div
-            className="nav-mobile-overlay"
-            style={{
-              position:      "fixed",
-              inset:          0,
-              background:    "var(--bg-0)",
-              zIndex:         999,
-              display:       "flex",
-              flexDirection: "column",
-              alignItems:    "center",
-              justifyContent:"center",
-              gap:            20,
-            }}
-          >
-            {/* Close button top-right */}
-            <button
-              onClick={() => setMenuOpen(false)}
-              style={{
-                position:   "absolute",
-                top:         24,
-                right:       24,
-                background: "none",
-                border:     "none",
-                cursor:     "pointer",
-                color:      "var(--cream)",
-                fontFamily: "var(--mono)",
-                fontSize:    20,
-              }}
-            >✕</button>
-
-            {/* Nav links — large serif, stacked vertically */}
-            {links.map((link) => (
-              <Link
-                key={link.id}
-                href={link.href}
-                onClick={() => setMenuOpen(false)}
-                style={{
-                  fontFamily:    "var(--serif)",
-                  fontSize:       28,
-                  fontWeight:     600,
-                  color:         "var(--cream)",
-                  textDecoration:"none",
-                  letterSpacing: "-0.01em",
-                }}
-              >
-                {link.label}
-              </Link>
-            ))}
-
-            {/* Locale toggle — mirrors desktop toggle */}
-            <div style={{
-              display:    "flex",
-              alignItems: "center",
-              gap:         0,
-              border:     "1px solid rgba(220,20,60,0.25)",
-              borderRadius:999,
-              padding:     3,
-              background: "rgba(0,0,0,0.3)",
-              marginTop:   8,
-            }}>
-              {(["pl", "en"] as const).map((lng) => (
-                <Link
-                  key={lng}
-                  href={lng === locale ? pathname : toggleHref}
-                  onClick={() => setMenuOpen(false)}
-                  style={{
-                    display:       "flex",
-                    alignItems:    "center",
-                    gap:            7,
-                    padding:       "6px 12px",
-                    borderRadius:   999,
-                    background:     lng === locale ? "rgba(220,20,60,0.15)" : "transparent",
-                    color:          lng === locale ? "var(--cream)" : "var(--muted)",
-                    fontSize:       11,
-                    letterSpacing: "0.18em",
-                    fontWeight:     600,
-                    transition:    "background 160ms",
-                  }}
-                >
-                  {lng === "pl" ? <FlagPL /> : <FlagGB />}
-                  {lng.toUpperCase()}
-                </Link>
-              ))}
-            </div>
-
-            {/* Divider */}
-            <div style={{ width: 40, height: 1, background: "rgba(220,20,60,0.2)" }} />
-
-            {/* Social icons */}
-            <div style={{ display: "flex", gap: 24 }}>
-              {SOCIAL_LINKS.map(({ href, label, icon }) => (
-                <a
-                  key={label}
-                  href={href}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  aria-label={label}
-                  onClick={() => setMenuOpen(false)}
-                  style={{ color: "var(--muted-2)", display: "flex" }}
-                >
-                  {icon}
-                </a>
-              ))}
-            </div>
-          </div>
-        )}
-
         {/* PL / EN language toggle */}
         <div className="nav-locale-desktop" style={{ display: "flex", alignItems: "center" }}>
         <div style={{
@@ -430,5 +322,101 @@ export default function NavBar({ locale, albums }: NavBarProps) {
         </div>
       </div>
     </nav>
+
+    {/* Mobile full-screen overlay — rendered as Fragment sibling, outside nav's transform stacking context */}
+    {menuOpen && (
+      <div style={{
+        position:            "fixed",
+        inset:               0,
+        zIndex:              98,
+        background:          "rgba(10,6,8,0.82)",
+        backdropFilter:      "blur(24px) saturate(140%)",
+        WebkitBackdropFilter:"blur(24px) saturate(140%)",
+        display:             "flex",
+        flexDirection:       "column",
+        alignItems:          "center",
+        justifyContent:      "center",
+        padding:             "80px 32px 48px",
+        overflowY:           "auto",
+      }}>
+        {/* Nav links */}
+        <div style={{ display: "flex", flexDirection: "column", gap: 0, width: "100%", maxWidth: 320 }}>
+          {links.map((link) => {
+            const active = isActive(link.href);
+            return (
+              <Link
+                key={link.id}
+                href={link.href}
+                onClick={() => setMenuOpen(false)}
+                style={{
+                  fontFamily:    "var(--serif)",
+                  fontSize:       26,
+                  fontWeight:     600,
+                  color:          active ? "var(--cream)" : "var(--muted)",
+                  padding:       "14px 0",
+                  borderBottom:  "1px solid var(--line)",
+                  letterSpacing: "0.02em",
+                  display:       "flex",
+                  alignItems:    "center",
+                  justifyContent:"space-between",
+                }}
+              >
+                {link.label}
+                {active && (
+                  <span style={{ width: 6, height: 6, borderRadius: "50%", background: "var(--gold)" }} />
+                )}
+              </Link>
+            );
+          })}
+        </div>
+
+        {/* Locale toggle */}
+        <div style={{ display: "flex", gap: 10, marginTop: 28, width: "100%", maxWidth: 320 }}>
+          {(["pl", "en"] as const).map((lng) => (
+            <Link
+              key={lng}
+              href={lng === locale ? pathname : toggleHref}
+              onClick={() => setMenuOpen(false)}
+              style={{
+                display:      "flex",
+                alignItems:   "center",
+                gap:           8,
+                padding:      "10px 18px",
+                borderRadius:  999,
+                background:    lng === locale ? "rgba(220,20,60,0.15)" : "transparent",
+                border:       `1px solid ${lng === locale ? "rgba(220,20,60,0.35)" : "rgba(255,255,255,0.08)"}`,
+                color:         lng === locale ? "var(--cream)" : "var(--muted)",
+                fontSize:      12,
+                letterSpacing: "0.18em",
+                fontWeight:    600,
+              }}
+            >
+              {lng === "pl" ? <FlagPL /> : <FlagGB />}
+              {lng.toUpperCase()}
+            </Link>
+          ))}
+        </div>
+
+        {/* Divider */}
+        <div style={{ height: 1, background: "var(--line)", margin: "28px 0", width: "100%", maxWidth: 320 }} />
+
+        {/* Social icons */}
+        <div style={{ display: "flex", gap: 20, flexWrap: "wrap", maxWidth: 320 }}>
+          {SOCIAL_LINKS.map(({ href, label, icon }) => (
+            <a
+              key={label}
+              href={href}
+              target="_blank"
+              rel="noopener noreferrer"
+              aria-label={label}
+              style={{ color: "var(--muted)", display: "flex" }}
+            >
+              {icon}
+            </a>
+          ))}
+        </div>
+      </div>
+    )}
+  </>
   );
 }

@@ -8,6 +8,10 @@ node_modules/
 frontend/.next/
 frontend/out/
 frontend/.turbo/
+admin/.next/
+admin/out/
+*.tsbuildinfo
+next-env.d.ts
 
 # Python
 __pycache__/
@@ -40,3 +44,6 @@ npm-debug.log*
 # Certs (managed by certbot on server)
 *.pem
 *.key
+
+# Large media — stored outside repo, not tracked in git
+releases/

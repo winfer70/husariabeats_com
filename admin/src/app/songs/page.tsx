@@ -30,6 +30,8 @@ interface Song {
   image_path:        string | null;
   youtube_id_pl:     string | null;
   youtube_id_en:     string | null;
+  youtube_short_pl:  string | null;
+  youtube_short_en:  string | null;
   spotify_url:       string | null;
   apple_music_url:   string | null;
   amazon_url:        string | null;
@@ -49,7 +51,7 @@ interface Song {
 }
 
 const VALID_STATUSES = [
-  "scaffold", "audio_ready", "sync_done", "render_done", "scheduled", "released",
+  "scaffold", "audio_ready", "sync_done", "render_done", "ready_to_release", "queued", "released",
 ];
 
 const VALID_ERAS = [
@@ -57,12 +59,13 @@ const VALID_ERAS = [
 ];
 
 const STATUS_BADGE: Record<string, string> = {
-  scaffold:    "badge-gray",
-  audio_ready: "badge-blue",
-  sync_done:   "badge-yellow",
-  render_done: "badge-orange",
-  scheduled:   "badge-purple",
-  released:    "badge-green",
+  scaffold:         "badge-gray",
+  audio_ready:      "badge-blue",
+  sync_done:        "badge-yellow",
+  render_done:      "badge-orange",
+  ready_to_release: "badge-lime",
+  queued:           "badge-teal",
+  released:         "badge-green",
 };
 
 // Shared cell + input styles
@@ -200,9 +203,51 @@ export default function SongsPage() {
   const [sortField, setSortField]   = useState<string>("year_event");
   const [sortDir,   setSortDir]     = useState<"asc" | "desc">("asc");
 
+  // File check cache: slug → result (null = fetch failed, undefined = not yet fetched)
+  const [fileStatus, setFileStatus] = useState<Record<string, {
+    pl_mp4: boolean; en_mp4: boolean;
+    feed_pl_mp4: boolean; feed_en_mp4: boolean;
+    thumb: boolean; missing: string[];
+  } | null>>({});
+
+  // Per-slug YouTube sync state
+  const [syncing, setSyncing] = useState<Record<string, boolean>>({});
+
   function showToast(msg: string) {
     setToast(msg);
     setTimeout(() => setToast(null), 3000);
+  }
+
+  /** Fetch file presence for a song; caches in fileStatus. */
+  async function fetchFileStatus(slug: string) {
+    if (fileStatus[slug] !== undefined) return;
+    try {
+      const res = await fetch(`/api/songs/${slug}/files`);
+      if (!res.ok) { setFileStatus(prev => ({ ...prev, [slug]: null })); return; }
+      const data = await res.json();
+      setFileStatus(prev => ({ ...prev, [slug]: data }));
+    } catch {
+      setFileStatus(prev => ({ ...prev, [slug]: null }));
+    }
+  }
+
+  /** Call POST /api/songs/{slug}/sync_youtube to append streaming links to YT descriptions. */
+  async function syncYoutube(slug: string) {
+    setSyncing(prev => ({ ...prev, [slug]: true }));
+    try {
+      const res = await fetch(`/api/songs/${slug}/sync_youtube`, { method: "POST" });
+      const data = await res.json().catch(() => ({ detail: res.statusText }));
+      if (!res.ok) throw new Error(data.detail || `HTTP ${res.status}`);
+      const { synced } = data;
+      const summary = Object.entries(synced as Record<string, boolean>)
+        .map(([lang, ok]) => `${lang.toUpperCase()}: ${ok ? "✓" : "✗"}`)
+        .join("  ");
+      showToast(`YouTube sync — ${summary}`);
+    } catch (e) {
+      showToast(`Sync failed: ${e instanceof Error ? e.message : "unknown error"}`);
+    } finally {
+      setSyncing(prev => ({ ...prev, [slug]: false }));
+    }
   }
 
   const fetchSongs = useCallback(async () => {
@@ -249,8 +294,8 @@ export default function SongsPage() {
     }
   }
 
-  // Columns: expand + slug + 7 meta + 2 YT + 5 platform = 16 total
-  const COL_COUNT = 16;
+  // Columns: expand + slug + 7 meta + 2 YT + 2 YT Short + 5 platform = 18 total
+  const COL_COUNT = 18;
 
   /** Toggle sort direction on same field; reset to asc on new field. */
   function handleSort(field: string) {
@@ -310,6 +355,8 @@ export default function SongsPage() {
                 <SortableTH field="release_date" label="Release" width={105} sortField={sortField} sortDir={sortDir} onSort={handleSort} />
                 <TH width={110}>YT PL</TH>
                 <TH width={110}>YT EN</TH>
+                <TH width={110}>Short PL</TH>
+                <TH width={110}>Short EN</TH>
                 <TH width={210}>Spotify</TH>
                 <TH width={210}>Apple Music</TH>
                 <TH width={210}>Amazon</TH>
@@ -338,11 +385,15 @@ export default function SongsPage() {
                       {/* ── Main row — all fields inline-editable ── */}
                       <tr style={{ opacity: isSaving ? 0.6 : 1, transition: "opacity 0.15s" }}>
 
-                        {/* Expand toggle (rich content) */}
+                        {/* Expand toggle (rich content + file status) */}
                         <TD center>
                           <button
-                            onClick={() => setExpanded(isExpanded ? null : song.slug)}
-                            title="Edit rich content (subtitles, summaries, sources)"
+                            onClick={() => {
+                              const opening = expandedSlug !== song.slug;
+                              setExpanded(opening ? song.slug : null);
+                              if (opening) fetchFileStatus(song.slug);
+                            }}
+                            title="Edit rich content + file status"
                             style={{
                               background: "none", border: "none", cursor: "pointer",
                               color: "#a89a92", fontSize: 11, padding: 4,
@@ -450,6 +501,20 @@ export default function SongsPage() {
                         <TD>
                           <InlineInput songSlug={song.slug} field="youtube_id_en"
                             value={song.youtube_id_en} disabled={isSaving}
+                            onPatch={patch} mono width={100} />
+                        </TD>
+
+                        {/* YouTube Short PL */}
+                        <TD>
+                          <InlineInput songSlug={song.slug} field="youtube_short_pl"
+                            value={song.youtube_short_pl} disabled={isSaving}
+                            onPatch={patch} mono width={100} />
+                        </TD>
+
+                        {/* YouTube Short EN */}
+                        <TD>
+                          <InlineInput songSlug={song.slug} field="youtube_short_en"
+                            value={song.youtube_short_en} disabled={isSaving}
                             onPatch={patch} mono width={100} />
                         </TD>
 
@@ -580,6 +645,79 @@ export default function SongsPage() {
                                   onPatch={patch} placeholder="Battle of Grunwald — banners against thundercloud sky"
                                   width={380} />
                               </DetailField>
+
+                              {/* File status panel */}
+                              <div style={{ gridColumn: "1 / -1" }}>
+                                <label style={{ fontSize: 10, color: "#a89a92", textTransform: "uppercase", letterSpacing: "0.05em" }}>
+                                  Release Files
+                                </label>
+                                {fileStatus[song.slug] === undefined && (
+                                  <p style={{ fontSize: 11, color: "#a89a92", margin: "6px 0 0" }}>Loading…</p>
+                                )}
+                                {fileStatus[song.slug] === null && (
+                                  <p style={{ fontSize: 11, color: "#c87070", margin: "6px 0 0" }}>Could not check files</p>
+                                )}
+                                {fileStatus[song.slug] && (() => {
+                                  const fs = fileStatus[song.slug]!;
+                                  const items: [boolean, string][] = [
+                                    [fs.pl_mp4,      `${song.slug}_pl.mp4`],
+                                    [fs.en_mp4,      `${song.slug}_en.mp4`],
+                                    [fs.feed_pl_mp4, `${song.slug}-feed-pl.mp4`],
+                                    [fs.feed_en_mp4, `${song.slug}-feed-en.mp4`],
+                                    [fs.thumb,       `${song.slug}_thumb.jpg`],
+                                  ];
+                                  return (
+                                    <div style={{ display: "flex", gap: 8, flexWrap: "wrap", marginTop: 6 }}>
+                                      {items.map(([ok, filename]) => (
+                                        <span
+                                          key={filename}
+                                          title={filename}
+                                          style={{
+                                            fontSize: 11, padding: "2px 8px",
+                                            borderRadius: 4,
+                                            border: ok ? "1px solid #2d4a27" : "1px solid #5a2a2a",
+                                            background: ok ? "#0d1f0a" : "#1f0a0a",
+                                            color: ok ? "#6dbf67" : "#c87070",
+                                            fontFamily: "monospace",
+                                          }}
+                                        >
+                                          {ok ? "✓" : "✗"} {filename}
+                                        </span>
+                                      ))}
+                                    </div>
+                                  );
+                                })()}
+                              </div>
+
+                              {/* YouTube description sync — shown when song has YT IDs */}
+                              {(song.youtube_id_pl || song.youtube_id_en) && (
+                                <div style={{ gridColumn: "1 / -1" }}>
+                                  <label style={{ fontSize: 10, color: "#a89a92", textTransform: "uppercase", letterSpacing: "0.05em" }}>
+                                    YouTube Sync
+                                  </label>
+                                  <div style={{ marginTop: 6, display: "flex", alignItems: "center", gap: 10 }}>
+                                    <button
+                                      onClick={() => syncYoutube(song.slug)}
+                                      disabled={!!syncing[song.slug] || isSaving}
+                                      title="Append streaming platform links to YouTube video descriptions"
+                                      style={{
+                                        fontSize: 12, padding: "4px 12px",
+                                        background: "#0d1e35",
+                                        border: "1px solid #1e4080",
+                                        color: "#6aadee",
+                                        borderRadius: 4, cursor: "pointer",
+                                        opacity: (syncing[song.slug] || isSaving) ? 0.5 : 1,
+                                      }}
+                                      aria-label={`Sync YouTube descriptions for ${song.slug}`}
+                                    >
+                                      {syncing[song.slug] ? "Syncing…" : "🎵 Sync YT descriptions"}
+                                    </button>
+                                    <span style={{ fontSize: 11, color: "#5a5048" }}>
+                                      Appends Spotify / Apple Music / streaming links to YT video descriptions
+                                    </span>
+                                  </div>
+                                </div>
+                              )}
 
                             </div>
                           </td>

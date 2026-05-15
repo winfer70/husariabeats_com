@@ -470,6 +470,36 @@ export default function AlbumsClientPage({ albums, locale }: AlbumsClientPagePro
   const t = useTranslations();
   const L = (locale === "pl" ? "PL" : "EN") as "PL" | "EN";
 
+  const [query,  setQuery]  = useState("");
+  const [sortBy, setSortBy] = useState<"default" | "title" | "era">("default");
+  const [focused, setFocused] = useState(false);
+
+  /* Filter by search query (title match, case-insensitive) */
+  const filtered = albums.filter((a) => {
+    if (!query.trim()) return true;
+    const q = query.toLowerCase();
+    return (
+      (a.title_pl ?? "").toLowerCase().includes(q) ||
+      (a.title_en ?? "").toLowerCase().includes(q) ||
+      (a.tagline_pl ?? "").toLowerCase().includes(q) ||
+      (a.tagline_en ?? "").toLowerCase().includes(q)
+    );
+  });
+
+  /* Sort */
+  const sorted = [...filtered].sort((a, b) => {
+    if (sortBy === "title") {
+      const ta = (L === "PL" ? a.title_pl : a.title_en) ?? "";
+      const tb = (L === "PL" ? b.title_pl : b.title_en) ?? "";
+      return ta.localeCompare(tb);
+    }
+    if (sortBy === "era") {
+      const eraOrder = ["medieval","partitions","wwi","wwii","cold_war","modern"];
+      return eraOrder.indexOf(a.era ?? "") - eraOrder.indexOf(b.era ?? "");
+    }
+    return 0; /* default — API order */
+  });
+
   return (
     <div className="page-pad">
 
@@ -507,13 +537,102 @@ export default function AlbumsClientPage({ albums, locale }: AlbumsClientPagePro
         }}>
           {t("albums.subtitle")}
         </p>
+
+        {/* Search + sort bar */}
+        <div style={{
+          display:        "flex",
+          gap:            12,
+          marginTop:      36,
+          flexWrap:       "wrap",
+          alignItems:     "center",
+        }}>
+          {/* Search input */}
+          <div style={{ position: "relative", flex: "1 1 240px", maxWidth: 400 }}>
+            <span style={{
+              position:   "absolute",
+              left:       14,
+              top:        "50%",
+              transform:  "translateY(-50%)",
+              color:      "var(--muted-2)",
+              fontSize:   13,
+              pointerEvents: "none",
+            }}>⌕</span>
+            <input
+              type="text"
+              value={query}
+              onChange={(e) => setQuery(e.target.value)}
+              onFocus={() => setFocused(true)}
+              onBlur={() => setFocused(false)}
+              placeholder={locale === "pl" ? "Szukaj albumów…" : "Search albums…"}
+              style={{
+                width:        "100%",
+                padding:      "12px 16px 12px 36px",
+                background:   "var(--bg-1)",
+                border:       `1px solid ${focused ? "rgba(200,168,75,0.5)" : "rgba(200,168,75,0.18)"}`,
+                borderRadius: 4,
+                color:        "var(--cream)",
+                fontSize:     14,
+                fontFamily:   "var(--sans)",
+                outline:      "none",
+                transition:   "border-color 200ms",
+              }}
+            />
+          </div>
+
+          {/* Sort dropdown */}
+          <select
+            value={sortBy}
+            onChange={(e) => setSortBy(e.target.value as typeof sortBy)}
+            style={{
+              padding:      "12px 16px",
+              background:   "var(--bg-1)",
+              border:       "1px solid rgba(200,168,75,0.18)",
+              borderRadius: 4,
+              color:        "var(--muted)",
+              fontSize:     12,
+              fontFamily:   "var(--mono)",
+              letterSpacing:"0.1em",
+              outline:      "none",
+              cursor:       "pointer",
+            }}
+          >
+            <option value="default">{locale === "pl" ? "SORTUJ: DOMYŚLNIE" : "SORT: DEFAULT"}</option>
+            <option value="era">{locale === "pl" ? "SORTUJ: ERA" : "SORT: ERA"}</option>
+            <option value="title">{locale === "pl" ? "SORTUJ: TYTUŁ" : "SORT: TITLE"}</option>
+          </select>
+
+          {/* Result count */}
+          {query && (
+            <div style={{
+              fontFamily:    "var(--mono)",
+              fontSize:      10,
+              color:         "var(--muted-2)",
+              letterSpacing: "0.18em",
+            }}>
+              {sorted.length} {locale === "pl" ? "wyników" : "results"}
+            </div>
+          )}
+        </div>
       </div>
 
       {/* Album grid */}
       <div className="albums-grid">
-        {albums.map((album) => (
+        {sorted.map((album) => (
           <AlbumCard key={album.slug} album={album} L={L} locale={locale} t={t} />
         ))}
+        {sorted.length === 0 && (
+          <p style={{
+            fontFamily: "var(--serif)",
+            fontStyle:  "italic",
+            fontSize:   20,
+            color:      "var(--muted)",
+            gridColumn: "1/-1",
+            textAlign:  "center",
+            padding:    "60px 0",
+          }}>
+            {locale === "pl" ? "Brak wyników." : "No results."}
+          </p>
+        )}
       </div>
     </div>
   );

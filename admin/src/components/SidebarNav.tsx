@@ -5,7 +5,7 @@
  * HusariaBeats admin panel.  Must be a Client Component so it can read
  * the current pathname from next/navigation and apply the active class.
  *
- * Links: Pipeline (/pipeline), Roadmap (/roadmap), Queue (/queue), Songs (/songs), Voting (/voting), Settings (/settings).
+ * Links: Pipeline, Roadmap, Queue, Songs, Voting, Upload, Status, Figures, Calendar, Flow, Settings.
  */
 
 "use client";
@@ -27,6 +27,11 @@ const NAV_ITEMS: NavItem[] = [
   { href: "/queue",    label: "Release Queue", icon: "⏱" },
   { href: "/songs",    label: "Songs",         icon: "🎵" },
   { href: "/voting",   label: "Voting",        icon: "🗳" },
+  { href: "/upload",   label: "Upload",        icon: "📤" },
+  { href: "/status",   label: "Status",        icon: "📊" },
+  { href: "/figures",  label: "Figures",       icon: "🏛" },
+  { href: "/calendar", label: "Calendar",      icon: "📅" },
+  { href: "/flow",     label: "Flow Guide",    icon: "📋" },
   { href: "/settings", label: "Settings",      icon: "⚙" },
 ];
 

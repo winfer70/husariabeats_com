@@ -230,9 +230,11 @@ a {
 .badge-blue    { background: #0d1e35; color: #6aadee; }
 .badge-yellow  { background: #2a2010; color: #e0b84a; }
 .badge-orange  { background: #2e1708; color: #e87d3a; }
+.badge-lime    { background: #0d2010; color: #4ade80; }
 .badge-purple  { background: #1e1030; color: #a87de8; }
 .badge-green   { background: #0d2018; color: #4acea8; }
 .badge-red     { background: #2e0a10; color: #e84a6a; }
+.badge-teal    { background: #0a2020; color: #4acece; }
 
 /* ── Settings rows ───────────────────────────────────────────────── */
 .settings-row {

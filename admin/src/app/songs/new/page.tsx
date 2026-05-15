@@ -22,7 +22,7 @@ import { useRouter } from "next/navigation";
 // ---------------------------------------------------------------------------
 
 const VALID_STATUSES = [
-  "scaffold", "audio_ready", "sync_done", "render_done", "scheduled", "released",
+  "scaffold", "audio_ready", "sync_done", "render_done", "ready_to_release", "queued", "released",
 ];
 
 const VALID_ERAS = [

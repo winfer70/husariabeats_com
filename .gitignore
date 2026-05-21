@@ -47,3 +47,10 @@ npm-debug.log*
 
 # Large media — stored outside repo, not tracked in git
 releases/
+
+# Claude internals
+.claude/
+
+# Graphify generated
+graphify-out/cache/
+graphify-out/*.html

@@ -414,17 +414,22 @@ export default function PipelinePage() {
       const data: Song[] = await songsRes.json();
       setSongs(Array.isArray(data) ? data : []);
       if (queueRes.ok) {
-        const queueData: { id: number; song_slug: string; status: string; platforms: string[] }[] = await queueRes.json();
+        const queueData: { id: number; song_slug: string; status: string; platforms: string[]; scheduled_at: string }[] = await queueRes.json();
         const idMap: Record<string, number> = {};
         const platMap: Record<string, Platform[]> = {};
+        const dateMap: Record<string, string> = {};
         for (const entry of queueData) {
           if (entry.status !== "released" && entry.status !== "failed") {
             idMap[entry.song_slug] = entry.id;
             platMap[entry.song_slug] = (entry.platforms ?? []) as Platform[];
+            if (entry.scheduled_at) {
+              dateMap[entry.song_slug] = new Date(entry.scheduled_at).toISOString().slice(0, 10);
+            }
           }
         }
         setQueueEntryIds(idMap);
         setEntryPlatforms(platMap);
+        setQueueDates(prev => ({ ...prev, ...dateMap }));
       }
     } catch (e) {
       setError(e instanceof Error ? e.message : "Failed to load songs");

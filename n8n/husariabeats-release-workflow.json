@@ -1229,7 +1229,7 @@
         "url": "https://husariabeats.com/api/revalidate",
         "sendBody": true,
         "specifyBody": "json",
-        "jsonBody": "={{ JSON.stringify({ secret: 'REDACTED', paths: ['/pl', '/en', '/pl/albums/' + $('TikTok Post (STUB)1').first().json.song.album_slug, '/en/albums/' + $('TikTok Post (STUB)1').first().json.song.album_slug] }) }}",
+        "jsonBody": "={{ JSON.stringify({ secret: $env.REVALIDATE_SECRET, paths: ['/pl', '/en', '/pl/albums/' + $('TikTok Post (STUB)1').first().json.song.album_slug, '/en/albums/' + $('TikTok Post (STUB)1').first().json.song.album_slug] }) }}",
         "options": {}
       },
       "id": "revalidate-site-husariabeats-001",

@@ -27,7 +27,8 @@ import re
 import shutil
 from pathlib import Path
 
-RELEASES_DIR_DEFAULT = Path("/home/REDACTED420/projects/husariabeats_com/releases")
+_PROJECT_DIR = Path(__file__).resolve().parents[2]
+RELEASES_DIR_DEFAULT = _PROJECT_DIR / "releases"
 
 # ── Helpers ───────────────────────────────────────────────────────────────────
 

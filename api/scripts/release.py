@@ -11,7 +11,7 @@ Commands:
     queue-list                       List release queue
 
 Usage examples:
-    python release.py import  /home/REDACTED420/projects/husariabeats_com/releases/zapomniani/meta.json
+    python release.py import  /path/to/releases/zapomniani/meta.json
     python release.py status  zapomniani render_done
     python release.py queue   zapomniani --at "2026-06-01T10:00" --platforms youtube,instagram
     python release.py trigger zapomniani

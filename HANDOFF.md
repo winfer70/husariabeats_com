@@ -10,7 +10,7 @@ Full bilingual lyrics created (PL + EN):
 - Style: aggressive Drill 808 + Orchestral Trap, multi-voice (gritty male / female rap / deep narrator)
 - Outro: "Pamiętajcie! / Polska nigdy nie zginęła! / HUSARIA BEATS!" (PL) / "Remember! / Poland never perished! / HUSARIA BEATS!" (EN)
 
-Remotion scaffold created at `Proton Drive/.../HusariaBeats/Remotion/src/songs/Jarema_1651/`:
+Remotion scaffold created at `<YOUR_CONTENT_ROOT>/Remotion/src/songs/Jarema_1651/`:
 - Jarema_1651Video.tsx (adapted from CecoraVideo)
 - story/story_data.ts (17 scenes)
 - story/StoryManager.tsx + StoryScene.tsx
@@ -22,7 +22,7 @@ Remotion scaffold created at `Proton Drive/.../HusariaBeats/Remotion/src/songs/J
 Compositions registered in Root.tsx:
 - id="Jarema1651-PL" + id="Jarema1651-EN"
 
-NewStructure song folder created at `Proton Drive/.../HusariaBeats/NewStructure/Unreleased/KREW_I_CHWALA/Jarema_1651/`:
+NewStructure song folder created at `<YOUR_CONTENT_ROOT>/NewStructure/Unreleased/KREW_I_CHWALA/Jarema_1651/`:
 - meta.json (full metadata, all platform descriptions)
 - PL/ and EN/ folders with: lyrics_clean.txt, lyrics_suno.txt, suno_prompt.txt, description_youtube.txt, tags_youtube.txt, hype_post_facebook.txt, hype_post_instagram.txt
 - SHARED/LeonardoPrompts.txt (15 image prompts)
@@ -33,7 +33,7 @@ NewStructure song folder created at `Proton Drive/.../HusariaBeats/NewStructure/
 - Phase 2 (Audio) PENDING — user must generate in Suno
 
 ## Exact Next Action
-1. Open `NewStructure/Unreleased/KREW_I_CHWALA/Jarema_1651/PL/suno_prompt.txt` + `PL/lyrics_suno.txt`
+1. Open `<YOUR_CONTENT_ROOT>/NewStructure/Unreleased/KREW_I_CHWALA/Jarema_1651/PL/suno_prompt.txt` + `<YOUR_CONTENT_ROOT>/NewStructure/Unreleased/KREW_I_CHWALA/Jarema_1651/PL/lyrics_suno.txt`
 2. Paste into Suno → generate PL vocal
 3. Repeat for EN
 4. Save both MP3s to PL/ and EN/ folders

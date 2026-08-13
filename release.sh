@@ -1,16 +1,16 @@
 #!/bin/bash
 # release.sh - husariabeats_com production release
-# Run from local dev machine. Merges dev -> main, tags, deploys to REDACTED.
+# Run from local dev machine. Merges dev -> main, tags, and deploys to your server.
 set -e
 
-NODE_IP="REDACTED"
-NODE_USER="REDACTED420"
-TARGET_DIR="/home/REDACTED420/projects/husariabeats_com"
+NODE_HOST="<YOUR_SERVER_HOST_OR_IP>"
+NODE_USER="<YOUR_SSH_USER>"
+TARGET_DIR="/srv/husariabeats_com"
 INTEGRATION_BRANCH="dev"
 DB_CONTAINER="husariabeats-db"
 DB_NAME="husariabeats"
 DB_USER="postgres"
-KUMA_PUSH_URL=""  # TODO: create Push monitor in REDACTED:3001, paste URL here
+KUMA_PUSH_URL=""  # Optional: paste your Uptime Kuma push URL here
 
 echo "[1/5] Merging $INTEGRATION_BRANCH -> main..."
 git checkout main && git pull origin main
@@ -21,8 +21,8 @@ git push origin main --tags
 git checkout "$INTEGRATION_BRANCH"
 echo "Tagged $VERSION"
 
-echo "[2/5] Connecting to $NODE_USER@$NODE_IP..."
-ssh "$NODE_USER@$NODE_IP" bash << ENDSSH
+echo "[2/5] Connecting to $NODE_USER@$NODE_HOST..."
+ssh "$NODE_USER@$NODE_HOST" bash << ENDSSH
 set -e
 cd "$TARGET_DIR"
 

@@ -9,7 +9,7 @@ Complete reference for the automated song release pipeline powered by n8n.
 | Property | Value |
 |---|---|
 | Workflow ID | `bB7YCOGVtKm6oZz0` |
-| n8n instance | `https://n8n.REDACTEDn8n.win` |
+| n8n instance | `https://n8n.your-automation-host.example` |
 | Node count | ~50 nodes |
 | Trigger | Cron — daily 09:00 Warsaw time (Europe/Warsaw) |
 
@@ -93,7 +93,7 @@ Complete reference for the automated song release pipeline powered by n8n.
     Headers: Content-Type: application/json
     Body:
       {
-        "secret": "REDACTED",
+        "secret": "<REVALIDATE_SECRET>",
         "paths": [
           "/pl",
           "/en",
@@ -200,16 +200,14 @@ The final n8n node (`Revalidate Site1`) calls the Next.js on-demand revalidation
 
 **Endpoint**: `POST https://husariabeats.com/api/revalidate`
 
-**Secret** (hardcoded in the n8n node `Revalidate Site1` and in `REVALIDATE_SECRET` env var):
+**Secret** (loaded from the `REVALIDATE_SECRET` environment variable in both n8n and the app runtime):
 
-```
-REDACTED
-```
+`<REVALIDATE_SECRET>`
 
 **Request body**:
 ```json
 {
-  "secret": "REDACTED",
+  "secret": "<REVALIDATE_SECRET>",
   "paths":  ["/pl", "/en", "/pl/albums/{album_slug}", "/en/albums/{album_slug}"]
 }
 ```

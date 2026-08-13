@@ -7,7 +7,7 @@ OVERVIEW
 Educational companion website for the Husaria Beats YouTube channel.
 Bilingual (PL/EN), timeline-based, community voting, YouTube embeds.
 Domain: husariabeats.com
-Server: same server as ticker-tap.com (existing nginx + Cloudflare DNS)
+Server: self-hosted Linux server (existing nginx + Cloudflare DNS)
 
 
 TECH STACK
@@ -217,7 +217,7 @@ RELEASE AUTOMATION ARCHITECTURE
 ---------------------------------
 Single source of truth: PostgreSQL DB (songs table + release_queue)
 Admin panel manages the queue and settings.
-n8n (existing at REDACTEDn8n.win) executes the release chain.
+n8n (self-hosted at n8n.your-automation-host.example) executes the release chain.
 
 RELEASE CHAIN (triggered by n8n daily cron 09:00):
   1. Check release_queue for today's scheduled items
@@ -254,7 +254,7 @@ ADMIN PANEL — CLOUDFLARE ACCESS (internal only)
 ------------------------------------------------
 URL: admin.husariabeats.com (or husariabeats-admin.com — TBD)
 Protection: Cloudflare Zero Trust → Access → Self-hosted application
-            Policy: Allow → Email → husariabeats@gmail.com
+            Policy: Allow → Email → <ADMIN_ACCESS_EMAIL>
             Nobody else can reach URL even if they know it
             Login: Cloudflare emails one-time code (no password to manage)
 
@@ -366,7 +366,7 @@ cd ~/docker/husariabeats
 #    A record: admin.husariabeats.com → server IP (orange cloud)
 #    SSL/TLS mode: Full (strict)
 #    Zero Trust → Access → add application for admin.husariabeats.com
-#                         policy: Allow email = husariabeats@gmail.com
+#                         policy: Allow email = <ADMIN_ACCESS_EMAIL>
 
 # 3. Get TLS cert (covers both subdomains)
 sudo certbot --nginx -d husariabeats.com -d www.husariabeats.com -d admin.husariabeats.com
@@ -406,7 +406,7 @@ ONE-TIME EXTERNAL SETUP (not server work)
    - console.cloud.google.com → New project: HusariaBeats
    - Enable YouTube Data API v3
    - Create OAuth 2.0 credential → Web Application
-   - Redirect URI: https://REDACTEDn8n.win/rest/oauth2-credential/callback
+   - Redirect URI: https://n8n.your-automation-host.example/rest/oauth2-credential/callback
    - Copy Client ID + Secret → add to n8n Google credential
    - Authorize once in n8n → refresh token stored automatically
    - No billing needed, free quota (10,000 units/day) is sufficient
@@ -434,7 +434,7 @@ ONE-TIME EXTERNAL SETUP (not server work)
 5. CLOUDFLARE ZERO TRUST:
    - dash.cloudflare.com → Zero Trust → Access → Applications
    - Add Self-hosted app → domain: admin.husariabeats.com
-   - Policy: Allow, Email = husariabeats@gmail.com
+   - Policy: Allow, Email = <ADMIN_ACCESS_EMAIL>
    - Free tier: 50 users — sufficient
 
 

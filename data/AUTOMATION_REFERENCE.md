@@ -181,7 +181,7 @@ SongName/
 - **YouTube Data API v3 OAuth** — not yet created; requires one-time Google Cloud Project setup
 - **DistroKid** — no API exists; script can prepare batch CSV but human must do final submit
 - **Social post rate limiting** — default 1 song/day gap; stored in DB `settings` table so it's changeable without code deploy; critical for album releases (10 songs over 10 days)
-- **n8n instance** — already running at `REDACTEDn8n.win` (Docker); integrate here before building new tooling
+- **n8n instance** — use your self-hosted n8n deployment (Docker); integrate here before building new tooling
 - **PostgreSQL DB** — single source of truth for song/album release status; scripts and n8n read/write it
 - **Bilingual uploads** — every song has PL + EN version; n8n uses `if (meta.description_en)` to conditionally upload EN; PL-only songs have no EN fields in `meta.json`
 - **DistroKid lead time** — Spotify needs ~1 day before YouTube publish date; plan scheduling accordingly

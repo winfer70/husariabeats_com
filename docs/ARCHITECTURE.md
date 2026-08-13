@@ -29,14 +29,14 @@ Core features:
 | Cache / rate-limit | Redis | 7 |
 | Containerisation | Docker Compose | — |
 | Reverse proxy | nginx (host) + Cloudflare (Full strict TLS) | — |
-| Release automation | n8n at `n8n.REDACTEDn8n.win` | — |
+| Release automation | n8n at `https://n8n.your-automation-host.example` | — |
 | Admin auth | Cloudflare Zero Trust Access | — |
 
 ---
 
 ## Service Topology
 
-All services run inside a single Docker Compose project on the same host as ticker-tap.com.
+All services run inside a single Docker Compose project on the same self-hosted Linux host.
 The host-bound ports are `127.0.0.1` only; nginx terminates TLS and proxies inbound traffic.
 
 ```
@@ -181,7 +181,7 @@ The NavBar receives its `albums` data as a prop from the layout server component
 
 ## Admin Panel
 
-Hosted at `admin.husariabeats.com`, protected by Cloudflare Zero Trust Access (one-time code to `husariabeats@gmail.com`).
+Hosted at `admin.husariabeats.com`, protected by Cloudflare Zero Trust Access (one-time code sent to `<ADMIN_ACCESS_EMAIL>`).
 
 Build: separate Next.js container at `127.0.0.1:3002`. All API calls use `INTERNAL_API_URL=http://api:8000`.
 
@@ -223,4 +223,4 @@ All secrets are stored in `.env` (never committed). See `.env.example` for a tem
 | TikTok | Content Posting API | Blocked — audit requires demo video |
 | Upload-Post | Third-party multi-platform API | Recommended fallback (~$9–19/mo) for TikTok + FB + IG |
 
-n8n OAuth redirect URI: `https://REDACTEDn8n.win/rest/oauth2-credential/callback`
+n8n OAuth redirect URI: `https://n8n.your-automation-host.example/rest/oauth2-credential/callback`

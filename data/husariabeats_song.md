@@ -275,7 +275,7 @@ Then automatically proceeds to Phase 3.
 Fully automated. Sets the exact video duration by measuring real audio length.
 
 ```bash
-cd "C:\Users\koter\Proton Drive\REDACTED420\My files\HusariaBeats"
+cd "<YOUR_HUSARIABEATS_WORKSPACE>"
 python scripts/sync_all.py --song {song_key} --method stable
 ```
 
@@ -339,7 +339,7 @@ Copy `align_lyrics_stable.py` (Beresteczko template) and update:
 Images are NOT required for this phase — `StoryScene.tsx` silently skips missing images.
 
 ```bash
-cd "C:\Users\koter\Proton Drive\REDACTED420\My files\HusariaBeats\Remotion"
+cd "<YOUR_REMOTION_WORKSPACE>"
 npm run dev
 # Select {SongTitle}-PL composition — showFrameCounter: true is already set
 ```
@@ -473,7 +473,7 @@ EN: "CAPTAIN PILECKI | HusariaBeats [EN]"
 ### 6.2 Render videos
 
 ```bash
-cd "C:\Users\koter\Proton Drive\REDACTED420\My files\HusariaBeats\Remotion"
+cd "<YOUR_REMOTION_WORKSPACE>"
 
 npx remotion render {SongTitle}{Year}-PL out/{slug}_pl.mp4 --codec h264 --crf 18 --pixel-format yuv420p --audio-bitrate 320k
 npx remotion render {SongTitle}{Year}-EN out/{slug}_en.mp4 --codec h264 --crf 18 --pixel-format yuv420p --audio-bitrate 320k

@@ -1,7 +1,10 @@
 # Environment secrets — NEVER commit
 .env
+.env.*
+!.env.example
 .env.local
 .env.production
+.envrc
 
 # Node
 node_modules/
@@ -40,6 +43,14 @@ Thumbs.db
 # Logs
 *.log
 npm-debug.log*
+
+# Backups / temp files
+*.bak
+*.backup
+*.tmp
+*.temp
+*.orig
+*.rej
 
 # Certs (managed by certbot on server)
 *.pem

@@ -88,7 +88,7 @@ const STAGES: Stage[] = [
     num: 6, emoji: "📤", title: "UPLOAD TO SERVER", color: "#60c0a0",
     items: [
       { text: "Open /upload → select song → drag-drop all 6 files" },
-      { text: "OR: SCP directly to /home/REDACTED420/projects/husariabeats_com/releases/{slug}/" },
+      { text: "OR: SCP directly to /srv/husariabeats_com/releases/{slug}/" },
       { text: "Verify all 6 files show ✓ green in /upload checklist" },
       { text: "Confirm URLs live: husariabeats.com/releases/{slug}/{slug}_pl.mp4" },
     ],

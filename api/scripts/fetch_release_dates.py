@@ -26,9 +26,7 @@ import httpx
 
 # ── Config ────────────────────────────────────────────────────────────────────
 
-YOUTUBE_API_KEY = os.environ.get(
-    "YOUTUBE_API_KEY", "REDACTED"
-)
+YOUTUBE_API_KEY = os.environ.get("YOUTUBE_API_KEY")
 YT_VIDEOS_URL = "https://www.googleapis.com/youtube/v3/videos"
 BATCH_SIZE = 50
 DB_CONTAINER = "husariabeats_com-db-1"
@@ -107,6 +105,9 @@ def main() -> None:
     )
     args = parser.parse_args()
     dry_run = not args.apply
+
+    if not YOUTUBE_API_KEY:
+        raise RuntimeError("YOUTUBE_API_KEY is not configured")
 
     # 1. Query DB for released songs with YouTube IDs but no release_date
     raw = psql_query(

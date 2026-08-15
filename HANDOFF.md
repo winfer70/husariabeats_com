@@ -1,48 +1,28 @@
-# HANDOFF — HusariaBeats / Jarema Wiśniowiecki Session
-Date: 2026-06-02
+# HANDOFF — HusariaBeats Security Remediation Session
+Date: 2026-08-15
 
 ## What Was Accomplished
-
-### Jarema Wiśniowiecki song — Phase 1 COMPLETE
-
-Full bilingual lyrics created (PL + EN):
-- Structure: Intro → Verse 1 (Male Rap, 10L) → Verse 2 (Female Rap, 6L) → Chorus (All, 5L) → Verse 3 (Male Rap, 10L) → Verse 4 (Narrator, 6L) → Bridge (Both, 8L) → Final Chorus (2L) → Outro
-- Style: aggressive Drill 808 + Orchestral Trap, multi-voice (gritty male / female rap / deep narrator)
-- Outro: "Pamiętajcie! / Polska nigdy nie zginęła! / HUSARIA BEATS!" (PL) / "Remember! / Poland never perished! / HUSARIA BEATS!" (EN)
-
-Remotion scaffold created at `<YOUR_CONTENT_ROOT>/Remotion/src/songs/Jarema_1651/`:
-- Jarema_1651Video.tsx (adapted from CecoraVideo)
-- story/story_data.ts (17 scenes)
-- story/StoryManager.tsx + StoryScene.tsx
-- data/scene_timings.ts + scene_timings_en.ts (all-zero placeholders)
-- data/lyrics_pl.ts (50 lines, proportional timing estimates)
-- data/lyrics_en.ts (50 lines, proportional timing estimates)
-- public/jarema-wisnowiecki/ folder (audio placeholders + scenes/.gitkeep)
-
-Compositions registered in Root.tsx:
-- id="Jarema1651-PL" + id="Jarema1651-EN"
-
-NewStructure song folder created at `<YOUR_CONTENT_ROOT>/NewStructure/Unreleased/KREW_I_CHWALA/Jarema_1651/`:
-- meta.json (full metadata, all platform descriptions)
-- PL/ and EN/ folders with: lyrics_clean.txt, lyrics_suno.txt, suno_prompt.txt, description_youtube.txt, tags_youtube.txt, hype_post_facebook.txt, hype_post_instagram.txt
-- SHARED/LeonardoPrompts.txt (15 image prompts)
-- SHARED/historical_research.txt
+- Completed a full-history safety review for public-release readiness.
+- Confirmed there are **no hard secrets anywhere in git history on any branch** (API keys, tokens, passwords, private keys, DB connection strings).
+- Identified the real issue: `main` had never been fast-forwarded to the final sanitization commit `268a389`, so its public tip still exposed now-removed infrastructure/admin recon details.
+- Fixed branch state by pushing `origin/dev` to `main`, then cleaning up fully merged stale branches:
+  - deleted `feature/security-remediation`
+  - deleted `feature/jarema-wisniowiecki-handoff`
+- Reset local `main` to match `origin/main`.
+- Final audit verdict: **repo is now safe to make public**.
 
 ## Current State
-- Phase 1 (Scaffold) COMPLETE
-- Phase 2 (Audio) PENDING — user must generate in Suno
+- `main` and `dev` now both point to `268a389`.
+- Only `main` and `dev` remain on GitHub.
+- Public tip is sanitized; the prior hostname/admin-auth identity disclosures are no longer present on the live branch tips.
+- Deployment tooling is still intentionally generic: `release.sh` expects host/user placeholders to be filled, then performs `dev -> main`, tags the release, backs up Postgres, and rebuilds Docker on the target host.
+- `docs/ARCHITECTURE.md` still indicates that SQL files in `db/` are applied manually against the running database when needed.
 
-## Exact Next Action
-1. Open `<YOUR_CONTENT_ROOT>/NewStructure/Unreleased/KREW_I_CHWALA/Jarema_1651/PL/suno_prompt.txt` + `<YOUR_CONTENT_ROOT>/NewStructure/Unreleased/KREW_I_CHWALA/Jarema_1651/PL/lyrics_suno.txt`
-2. Paste into Suno → generate PL vocal
-3. Repeat for EN
-4. Save both MP3s to PL/ and EN/ folders
-5. Tell Claude: "Audio saved, copy to Remotion for jarema-wisnowiecki" → Phase 3 sync runs automatically
-
-## Known Issues / Notes
-- StoryScene.tsx import path `../../../../shared/useAudioPulse` — verify in Remotion Studio (may need `../../../shared/useAudioPulse`)
-- lyrics_pl.ts / lyrics_en.ts startFrame values are estimates — sync scripts overwrite with real timestamps in Phase 3
-- ZAPOMNIANI 4-song release queue (general-maczek, groszkowski-janusz, kosacki-mine-detector, wojtek-niedzwiedz) still pending
+## Exact Next Actions
+1. Make `winfer70/husariabeats_com` public when ready; security remediation is complete.
+2. Before the next production deploy, update `release.sh` with the current production host/user details (host name only; do not reintroduce LAN IPs or private access identifiers into repo docs/scripts).
+3. If any pending SQL migration files exist in `db/`, apply them manually on the live database as part of the next deploy window.
+4. Optionally refresh operational docs so the current production home is documented by host name (`labserver`) rather than legacy references, without adding sensitive topology details.
 
 ## Blockers
-None. Phase 2 is a human Suno task.
+- None.

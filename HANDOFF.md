@@ -1,28 +1,27 @@
-# HANDOFF — HusariaBeats Security Remediation Session
-Date: 2026-08-15
+# HANDOFF — husariabeats_com
+Date: 2026-08-29 (updated by Cursor scan)
 
-## What Was Accomplished
-- Completed a full-history safety review for public-release readiness.
-- Confirmed there are **no hard secrets anywhere in git history on any branch** (API keys, tokens, passwords, private keys, DB connection strings).
-- Identified the real issue: `main` had never been fast-forwarded to the final sanitization commit `268a389`, so its public tip still exposed now-removed infrastructure/admin recon details.
-- Fixed branch state by pushing `origin/dev` to `main`, then cleaning up fully merged stale branches:
-  - deleted `feature/security-remediation`
-  - deleted `feature/jarema-wisniowiecki-handoff`
-- Reset local `main` to match `origin/main`.
-- Final audit verdict: **repo is now safe to make public**.
+## Current state
+- Branch: `main` ⚠️ — `main` and `dev` are at the same commit (`268a389`), so no divergence risk right now. But next work should branch off `dev`, not `main`.
+- Security remediation complete. Repo is safe to make public.
+- `release.sh` has placeholder host/user values — fill before next deploy.
 
-## Current State
-- `main` and `dev` now both point to `268a389`.
-- Only `main` and `dev` remain on GitHub.
-- Public tip is sanitized; the prior hostname/admin-auth identity disclosures are no longer present on the live branch tips.
-- Deployment tooling is still intentionally generic: `release.sh` expects host/user placeholders to be filled, then performs `dev -> main`, tags the release, backs up Postgres, and rebuilds Docker on the target host.
-- `docs/ARCHITECTURE.md` still indicates that SQL files in `db/` are applied manually against the running database when needed.
+## Recent work
+- Jarema Wisniowiecki song session documented (merged `feature/jarema-wisniowiecki-handoff`).
+- Security sanitization (secrets, LAN IPs removed from history).
+- Admin dashboard expansion, historical figures, upload pipeline.
 
-## Exact Next Actions
-1. Make `winfer70/husariabeats_com` public when ready; security remediation is complete.
-2. Before the next production deploy, update `release.sh` with the current production host/user details (host name only; do not reintroduce LAN IPs or private access identifiers into repo docs/scripts).
-3. If any pending SQL migration files exist in `db/`, apply them manually on the live database as part of the next deploy window.
-4. Optionally refresh operational docs so the current production home is documented by host name (`labserver`) rather than legacy references, without adding sensitive topology details.
+## Song data location
+No `content/songs/` directory. Song data lives in `data/husariabeats_song.md` and `data/AUTOMATION_REFERENCE.md`.
 
-## Blockers
-- None.
+## Immediate next action
+**Jarema_1651 Suno audio** — generate PL+EN audio via Suno, save as `audio_pl.mp3` and `audio_en.mp3` into the song folder / db entry, then say "Audio saved" to proceed with the pipeline. Skills at: `C:\Users\koter\Proton Drive\kamilo420\My files\HusariaBeats\SKILLS\new-song.md`
+
+## n8n Code node reminder
+`helpers.httpRequest`, URL-encoded body. Not `$helpers`, not `fetch`, not `FormData`.
+
+## Other next actions
+1. Before next deploy: fill `release.sh` with actual production host/user (labserver or swiss-knife — confirm current host).
+2. Apply any pending SQL migration files in `db/` manually on live DB.
+3. Make `winfer70/husariabeats_com` public on GitHub — security review complete.
+4. Future: GRANICE album (next after Jarema_1651).
